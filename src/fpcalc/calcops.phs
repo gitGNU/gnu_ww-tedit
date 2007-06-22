@@ -1,0 +1,12 @@
+not	 '~'
+xor	 '^'
+or	 '|'
+and	 '&'
+mod	 '%'
+div	 '/'
+shl	 SHL
+shr	 SHR
+int      INT
+unsigned UNSIGNED
+float    FLOAT
+double   DOUBLE

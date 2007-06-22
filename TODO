@@ -1,0 +1,33 @@
+SHORT-TERM:
+* remove most of VALIDATE_HEAP_PTR and VALIDATE_HEAP, which were put temporarely
+* highlight pairs of () and []
+* ctrl+] : goto matching pair
+* ctrl+[ : goto to the { or current level - 1
+* Indent/Unindent block should work even if block is hidden
+* in X Read fron from the .ini, like in the Windows GUI
+* in gui_scr and x_scr and elsewhere fix the buf[255] to be bigger/smarter!
+* ini2.c, when writing .ini files, check that no section is written
+  if no changes were made on any of the options; this is necessary to permit
+  for more than one editor to store .ini files on exit
+* when resizing the screen make the file status line show the width and
+  the height of the file area, the format should be WxH instead of
+  row:col
+* prepare native palette for text console in putty, redo the way palettes
+  are maintained to permit italics and bolds for comments and highlights
+* add the thwrap multithread library
+* refactor display and keyboard into separate module (library)
+* EVENT_KEY is too big, move out from HandleFileViewEvents (fview.c)
+* establish min size (use MSG_SET_MIN_SIZE)
+
+IDEAS:
+* in the .ini file add section to permit the adding of
+  new ESC sequences
+* Pressing <End> twice will show the current func name tooltip if not
+  currently visible on the screen
+* Think of highlighting TABS
+* Think of highlighting SPACES at the end of the lines
+* make ctrl+kz -- suspend (unix suspend), this when suspend is implemented
+* ini2.c -- merge histories of files and ed lines based on a time stamp,
+  this will permit that upon exit multiple editor instances would not
+  overwrite eachothers data blindly
+

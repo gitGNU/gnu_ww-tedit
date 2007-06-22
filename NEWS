@@ -1,0 +1,180 @@
+--- version 0.2.3 build 50 --- [ 2006-02-14 ]
+. [bug #15293] option UseTabs has no effect when turned off
+. X GUI: window didn't show correct title
++ resize in X11 version, maximize, restore
+. [bug #15192] wglob.ini always created in the current directory
+
+--- version 0.2.3 build 49 --- [ 2006-01-01 ]
+. [bug #11337] Win32 GUI: window is resizable
++ resize in Win32 GUI
+. [bug #14871] Makefile: the build fails mysteriously if output
+  directories don't exist
+. [bug #14870] Makefile: the X and console versions have the same
+  name & directory
+. [bug #14869] The X version cannot be compiled with static libraries
+
+--- version 0.2.3 build 48 --- [ 2005-10-25 ]
+. [bug #13445] Linux/X: Reverse quote doesn't work
++ free type fonts (xft) in X
+. [bug #13250] Clipboard doesn't work in X
+. [bug #12067] fix tab/shift+tab in linux text console and
+  other key bindings
+. [bug #12743] console version read_kbd craps out in the middle
+  of ESC-seq
+. [bug #13484] search with options (-i, -b) doesn't work
+. [bug #13489] search beyond last occurence fails
+. [bug #13491] search with "-b" must jump on the previous if current
+  pos matches
+. [bug #13508] on solaris xterm, backspace is unrecognized]
+. [bug #13517] another failing search
++ imroved kaydefs for xterm
+. [bug #12309] mark-to-end-of-word is incorrect
+. [bug #12311] CheckDocumentTypeSet() fails when plug-in activated
+. [bug #12196] user bookmarks navigations doesn't work
++ stricter heap validation on Windows
+. {crash} saving bookmarks to .ini file fails
+. [bug #12275] {crash} two copys of a file in memory and bookmarks
+. [bug #12745] when wglob.ini is edited, don't store global cfg
+
+--- version 0.2.3 build 42 --- [ 2005-05-11 ]
+. [bug #12883] DEL moves the cursror to the beginning of file
+. [bug #11807] backspace inserts ctrl+h on some text terminals
+. [bug #12976] linux console, some function keys are unrecognized
+. [bug #13000] Font1Sz has no effect
+. [bug #12975] in linux console paste with mouse fails
+. [bug #9597] tooltip is black bg on black fg on linux console
+. [bug #6390] WW crash when loading a file
+. [bug #12198] {crash} in bizarre combination of bookmarks and search
+
+--- version 0.2.3 build 38 --- [ 2005-04-19 ]
++ Restore screen position from wglob.ini
+. [bug #6389] Win32 window position
++ Store screen geometry in wglob.ini
+. [bug #11416] assertion failure nav.c, line: 260
++ Config file functions now support replacement of
+  sections in the .ini files.
+. [bug #11273] save_as doesn change the document type
+. [bug #11893] The window title is not updated when a new file
+  is open from the bookmarks
+. [bug #10641] files from "FindInFiles" -> doc options not active
+. [bug #11914] frequent crashes
+. [bug #11941] Win32 GUI build assertion failure when minimized
+. [bug #11334] Win32 GUI keyboard: incremental search doesn't work
+. [bug #11576] NumLock isn't handled correctly under windows
+. [bug #11635] missed a call to PyLangRegister()
+. [bug #11905] VC palete broken again in b34
+
+--- version 0.2.2 build 34 --- [ 2005-01-16 ]
++ window title shows the name of the current file
++ syntax highlighting for .py files
++ rudimentary implementation of resize for GUI version
+. fixed keyboard issues in the GUI version
++ first elements of "parse log files"
++ hidden block is created when {} are highlighted
+. [bug #6483] ctrl+tab doesn't work in the win32-gui build
+. [bug #10524] autoindent computed to 0 at bracket level 0
+. Various fixes -- autoindent on paste and inv.assert in bookmfindnext
+. [bug #10653] {crash} ApplyFuncBookmarksColors()
+. [bug #10658] spliting a line with multi-line paste doesn't work!
+. [bug #10666] {crash} buffer overflow in extract_brackets_tooltip_lines()
+. [bug #10523] {crash} pasting at indent 0
+. [bug #10328] {crash} undo crashes when in delete at the e-o-f
+. [bug #10534] {crash} deleting special selection
+  at the EOF, single line
+. [bug #10535] {crash} Deleting special selection at EOF
++ Paste with autoindent for C files
+. [bug #9210] wrongly highlighting function names in a .h file
+. [bug #10404] 'float' and 'double' not recognised as reserved words
+. [bug #10402] '}' autoformatting will not work in some cases
+. [bug #10403] '}' crashes WW
++ typing '}' is autoformatted based on the opening '{'
+* Search|Functions's rendering now doesn't show the same
+  file name on every line
+
+--- version 0.2.1 build 23 --- [ 2004-08-30 ]
+* fix: [bug #9711] doing replace /$/bla/ doesn't show clearly the position
+* Fix: [bug #9118] {} wrongly highlights a ';'
+* Fix: [bug #9135] {} not highlighted if on consequtive lines
+* Reimplemented function_name_scan() to use new syntax scan primitives
+* Fix: [bug #9360] opening a comment /* doesn't remove func-name highlighting
+* Fix: [bug #9993] pointer warnings on Itanium
+* Fix: [bug #9994] assert failed on Itanium
+* Fix: [bug #9915] reserved word "union" is not highlighted
+* Fix: [bug #9845] {crash} /\n//
+* Fix: [bug #9706] [crash] FindInFiles parses wrongly an empty file name
+* Fix: [bug #9844] "-b /$/bla/" goes on replacing at line #1 forever
+* Fix: [bug #9712] /$/bla/ goes on a replacing binge
+* Fix: [bug #9806] {crash} GotoPrevBookmark with no bookmarks
+* Fix: [bug #9680] hint when the cursor is at the top of the screen
+* Fix: [bug #9071] file opened from the command line uses wrong options
+* Fix: [bug #9710] Find: "-b /^/" puts editor in endless loop
+* Fix: [bug #6992] search for new line character '\n' crashes the editor
+* Fix: [bug #7496] specific replace command "s/^/ /" doesn't work
+* Fix: [bug #9633] "find: s///" doesn't show the
+  prompt "replace (y/n/a/esc)" prompt
+* Fix: [bug #9591] [crash] F8, select, Alt+X
+* Fix: [bug #9590] [crash] Alt+X while in incremental search
+* Fix: [bug #9632] [crash] deleting a line with a bookmark sometimes
+  results in a crash
+* Fix: [bug #9589] Endless duplication of func-name in Search-Func window
+* Fix: [bug #9571] [crash] replace-command corrupts the file
+
+--- build 0.2.22 --- [ 2004-07-05 ]
+* Added: Scrolling gets hints from the tooltip function
+* Fix: [bug #9381] a crash related to {} highlighting
+* Fix: [bug #9070] file|save_as doesn't detect file type
+* Fix: [bug #6388] status line not updated after exiting calculator
+
+--- build 0.2.21 --- [ 2004-06-30 ]
+* Added: Tooltips of {} for the invisible if, while, etc.
+* Added: Highlighting of if/else pair
+* Fix: [bug #9029] pasting in an empty .c file crashes the editor
+* Fix: [bug #9031] matching brackets highlighting crashes the editor
+* Fix: loading and applying of recoverfy files wrong
+* Fix: loading second copy of a file crashed
+* Added: Highlighint of do/while pair
+* Added: Highlighting of the preceding if/do/while/func_name
+* Fix: MRU list held unwanted "noname" files
+* Added: Highlighting when typing a closing '}'
+* Added: Highlighting of pairs of curly brackets '{}'
+* Added: Blocks auto-unmark fails in UserBookmarksViewer
+* Added: [Del] deletes bookmarks in the UserBookmarksViewer
+
+--- build 0.2.20 --- [ 2004-04-29 ]
+* Fix: unix text console now works in ssh and telnet
+* Fix: various bookmarks fixes
+* Added: F8 marks a block
+* Fix: WW failes to read keyboard under rxvt in cygwin
+* Added: eliminated all warnings from compilation with "GCC -Wall"
+* Fix: BMFindFirstBookmark() had no filenames as a filter
+* Fix: UpdateFuncNamesBookmarks() fails for non .c files
+* Added: [UserBookmarks] are color marked in the file
+* Fix: alignment to 16 bytes added in bookmarks management
+* Fix: Makefile fixed to work on irix and solaris
+* Fix: function_scan() failes on empty .c files
+* Added: C/C++ function names highlighting added
+* Fix: closing a file might distort another file's first bookmark
+* Fix: BMSetFindNextBookmark() falls in endless loop in Find In Files
+* Fix: CmdFileClose() fails if bookmarks viewer is active
+* Fix: function highlight in bookmarks viewer mishighlighted
+* Fix: '/*' or '*/' propagates valid eol status to the end of the file
+* Fix: refined function scan, less false positives
+* Added: autoincremental search in Search|Functions bookmarks viewer
+* Fix: /t messes the syntax highlighting output
+* Added: search|functions viewer highlights the names
+* Fix: Search|Functions used to hang when hitting "struct {}"
+* Fix: Search|Functions bookmarks view crashed at File|Close
+* Fix: editor used to crash when last file is closed
+
+--- build 0.2.16 --- [ 2004-01-14 ]
+* Added: checking in all the changes from the last 20 months
+* Added: non-modal panes
+* Added: version for X
+* Added: GUI simulated character mode for Windows
+* Added: Syntax highlighting for C/C++
+* Added: Functions scan for C/C++
+
+--- build 0.2.15 ---
+* Added Replace command
+* Added new help pages and extentions of the context sensitive help
+
