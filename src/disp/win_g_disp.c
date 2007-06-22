@@ -530,10 +530,8 @@ static void _disp_invalidate_rect(const dispc_t *disp, RECT *r)
   if (r->bottom == window_bottom);
     r->bottom += disp->char_size.cy;
   InvalidateRect(disp->wnd, r, FALSE);
-  #if 0
-  debug_trace("disp_invalidate_rect: %d, %d to %d, %d\n",
-              r->left, r->top, r->right, r->bottom);
-  #endif
+  /*debug_trace("disp_invalidate_rect: %d, %d to %d, %d\n",
+              r->left, r->top, r->right, r->bottom);*/
 }
 
 /*!
@@ -635,8 +633,8 @@ void disp_put_block(dispc_t *disp,
     {
       s = &buf->cbuf[ln * w + range_start];
       memcpy(char_ln + range_start, s, range_num_chars * sizeof(disp_char_t));
-      debug_trace("put_block %d:%d len %d (-%d)\n", x, y + ln, w,
-                  w - range_num_chars);
+      /*debug_trace("put_block %d:%d len %d (-%d)\n", x, y + ln, w,
+                  w - range_num_chars);*/
 
       /* Invalidate only the range that has changed */
       _disp_validate_rect(disp, x + range_start, y, range_num_chars, h);
@@ -676,6 +674,9 @@ void disp_get_block(const dispc_t *disp,
 
 /*!
 @brief Displays a string at a specific screen position
+
+Function verifies if screen content changes and will not emit
+refresh call to the OS if nothing changed.
 
 @param disp  a display object
 @param s     string to display
@@ -737,14 +738,17 @@ void disp_write(dispc_t *disp,
     _disp_validate_rect(disp, x + range_start, y, range_num_chars, 1);
   }
 
-  debug_trace("write %d:%d len %d (-%d)\n", x, y, len,
-              len - range_num_chars);
+  /*debug_trace("write %d:%d len %d (-%d)\n", x, y, len,
+              len - range_num_chars);*/
 }
 
 /*!
 @brief Displays a string with alternating attributes at a specific screen pos
 
 Attributes are alternated between attr1 and attr2 by the '~' character
+
+Function verifies if screen content changes and will not emit
+refresh call to the OS if nothing changed.
 
 @param disp  a display object
 @param s     string to display
@@ -760,7 +764,12 @@ void disp_flex_write(dispc_t *disp,
   int len;
   int i;
   disp_char_t *char_ln;
+  disp_char_t *d;
+  disp_char_t a;
   int attr;
+  int range_start;
+  int range_end;
+  int range_num_chars;
 
   ASSERT(VALID_DISP(disp));
 
@@ -769,6 +778,15 @@ void disp_flex_write(dispc_t *disp,
     return;
 
   char_ln = _disp_buf_access(disp, x, y);
+
+  disp_is_inside_disp_buf(disp, char_ln, len);
+
+  /*
+  Put characters into the screen buffer
+  Also mark the segment that encompases the range of changes
+  */
+  range_start = -1;
+  range_end = -1;
   display_len = 0;
   attr = attr1;
   for (i = 0; i < len; ++i)
@@ -779,17 +797,39 @@ void disp_flex_write(dispc_t *disp,
        attr = (attr == attr1 ? attr2 : attr1);
     else
     {
+      a.c = s[i];
+      a.a = attr;
+
+      d = char_ln + display_len;
+      if (!disp_char_equal(a, *d))
+      {
+        if (range_start == -1)
+          range_start = display_len;
+        range_end = display_len;
+      }
+
       char_ln[display_len].c = s[i];
       char_ln[display_len].a = attr;
       ++display_len;
     }
   }
 
-  _disp_validate_rect(disp, x, y, display_len, 1);
+  range_num_chars = 0;
+  if (range_start != -1)
+  {
+    range_num_chars = range_end - range_start + 1;
+    _disp_validate_rect(disp, x + range_start, y, range_num_chars, 1);
+  }
+
+  /*debug_trace("flex_write %d:%d len %d (-%d)\n", x, y, display_len,
+              display_len - range_num_chars);*/
 }
 
 /*!
 @brief Fills an area on the screen with a specific character
+
+Function verifies if screen content changes and will not emit
+refresh call to the OS if nothing changed.
 
 @param disp  a display object
 @param c     character with whcih to fill
@@ -802,6 +842,11 @@ void disp_fill(dispc_t *disp, char c, int attr, int x, int y, int count)
 {
   int i;
   disp_char_t *char_ln;
+  disp_char_t *d;
+  disp_char_t a;
+  int range_start;
+  int range_end;
+  int range_num_chars;
 
   ASSERT(VALID_DISP(disp));
   ASSERT(count >= 0);
@@ -810,15 +855,41 @@ void disp_fill(dispc_t *disp, char c, int attr, int x, int y, int count)
     return;
 
   char_ln = _disp_buf_access(disp, x, y);
+  disp_is_inside_disp_buf(disp, char_ln, count);
+
+  /*
+  Put characters into the screen buffer
+  Also mark the segment that encompases the range of changes
+  */
+  range_start = -1;
+  range_end = -1;
+  a.c = c;
+  a.a = attr;
   for (i = 0; i < count; ++i)
   {
     ASSERT(x + i < disp->buf_width);
+
+    d = char_ln + i;
+    if (!disp_char_equal(a, *d))
+    {
+      if (range_start == -1)
+        range_start = i;
+      range_end = i;
+    }
 
     char_ln[i].c = c;
     char_ln[i].a = attr;
   }
 
-  _disp_validate_rect(disp, x, y, count, 1);
+  range_num_chars = 0;
+  if (range_start != -1)
+  {
+    range_num_chars = range_end - range_start + 1;
+    _disp_validate_rect(disp, x + range_start, y, range_num_chars, 1);
+  }
+
+  /*debug_trace("fill %d:%d len %d (-%d)\n", x, y, count,
+              i - range_num_chars);*/
 }
 
 /*!
