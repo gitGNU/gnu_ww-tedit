@@ -49,7 +49,9 @@ TKeySequence WindowsCUI[] =
   {cmEditNextWord, DEF_KEY1(KEY(kbCtrl, kbRight))},
   {cmEditPrevWord, DEF_KEY1(KEY(kbCtrl, kbLeft))},
   {cmEditHome, DEF_KEY1(KEY(0, kbHome))},
+  {cmEditHome, DEF_KEY2(KEY(kbCtrl, kbK), KEY(0, kbLeft))},
   {cmEditEnd, DEF_KEY1(KEY(0, kbEnd))},
+  {cmEditEnd, DEF_KEY2(KEY(kbCtrl, kbK), KEY(0, kbRight))},
   {cmEditTopFile, DEF_KEY1(KEY(kbCtrl, kbHome))},
   {cmEditBottomFile, DEF_KEY1(KEY(kbCtrl, kbEnd))},
   {cmEditPageUp, DEF_KEY1(KEY(0, kbPgUp))},
@@ -118,7 +120,21 @@ TKeySequence WindowsCUI[] =
   {cmOptionsToggleColumnBlock, DEF_KEY1(KEY(kbCtrl | kbShift, kbF8))},
   {cmOptionsToggleColumnBlock, DEF_KEY2(KEY(kbCtrl, kbK), KEY(0, kbN))},
   {cmHelpKbd, DEF_KEY1(KEY(0, kbF1))},
-  {cmDiag, DEF_KEY1(KEY(kbCtrl, kbD))},
+  {cmDiag, DEF_KEY2(KEY(kbCtrl, kbD), KEY(0, kbM))},
+
+  {cmEditToggleBlockMarkMode, DEF_KEY1(KEY(kbCtrl, kbE))},
+  {cmOptionsToggleColumnBlock, DEF_KEY2(KEY(kbCtrl, kbD), KEY(0, kbE))},
+  {cmEditIncrementalSearch, DEF_KEY2(KEY(kbCtrl, kbD), KEY(0, kbI))},
+  {cmEditFindNext, DEF_KEY1(KEY(kbCtrl, kbL))},
+  {cmEditFindBack, DEF_KEY2(KEY(kbCtrl, kbD), KEY(0, kbL))},
+  {cmEditNextWord, DEF_KEY2(KEY(kbCtrl, kbD), KEY(0, kbRight))},
+  {cmEditPrevWord, DEF_KEY2(KEY(kbCtrl, kbD), KEY(0, kbLeft))},
+  {cmEditTopFile, DEF_KEY2(KEY(kbCtrl, kbD), KEY(0, kbHome))},
+  {cmEditBottomFile, DEF_KEY2(KEY(kbCtrl, kbD), KEY(0, kbEnd))},
+  {cmEditBookmarkToggle, DEF_KEY2(KEY(kbCtrl, kbB), KEY(0, kbB))},
+  {cmWindowBookmarkNext, DEF_KEY2(KEY(kbCtrl, kbB), KEY(0, kbDown))},
+  {cmWindowBookmarkPrev, DEF_KEY2(KEY(kbCtrl, kbB), KEY(0, kbUp))},
+
   {END_OF_KEY_LIST_CODE}  /* LastItem */
 };
 
