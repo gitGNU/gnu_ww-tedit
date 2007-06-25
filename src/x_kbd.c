@@ -250,6 +250,8 @@ TFKeyDefs FKeys[] =
   {XK_KP_Enter, KEY(0, kbEnter)},
   {XK_Insert, KEY(0, kbIns)},
   {XK_Delete, KEY(0, kbDel)},
+  {XK_KP_Insert, KEY(0, kbIns)},
+  {XK_KP_Delete, KEY(0, kbDel)},
   {XK_KP_Add, KEY(0, kbGrayPlus)},
   {XK_KP_Subtract, KEY(0 , kbGrayMinus)},
 //  {XK_KP_Multiply,    '*' | kfGray },
