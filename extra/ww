@@ -1,0 +1,6 @@
+#!/bin/bash
+if [ -z "$DISPLAY" ]; then
+  exec ww_con $@
+  exit
+fi
+exec ww_g $@

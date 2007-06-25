@@ -1,0 +1,1277 @@
+\input texinfo   @c -*-texinfo-*-
+@c %**start of header
+@setfilename ww.info
+@c %**end of header
+
+@node Top, Foreword, , (dir)
+
+@display
+
+WW -- a text editor
+
+User's Manual and On-line help
+
+@end display
+
+@menu
+* Foreword::            Foreword to version 2.0
+* Copying::             Distribution license
+* Credits::             Author and who helped
+
+File
+* new::                 Create a new empty file in memory
+* open::                Load a file from disk in memory
+* open_r_only::         Load a read only copy of a file in memory
+* close::               Close a file edited in memory
+* save::                Save a file to disk
+* saveas::              Save a file under different name
+* saveall::             Save all changed files to disk
+* recentfiles::         Show a list of recently edited files
+* exit::                Quit the editor
+
+Edit
+* navigation::          Cursor navigation
+* blocksel::            Block selection (marking)
+* block::               Block operations
+* undo::                Undo/Redo and recovery file
+* basic::               Basic text input
+* bookmarks::           Bookmarks
+
+Search/Replace
+* search::              Search and replace
+* isearch::             Incremental search
+* findinfiles::         Find and Replace in files
+* gotoln::              Goto line
+* reguexpr::            Regular expressions
+
+Tools
+* calc::                Calculator
+
+Windows
+* wnavigation::         Navigation among windows/files
+* userscr::             User screen
+* wlist::               Windows/files list
+* messages::            Messages window
+
+* pline_edit::          Prompt line edit keybindings
+
+* error_msg::           Error messages, Warnings and Prompts
+
+Anouncements/Tips
+* Anouncements::        What's new and list of tips and tricks
+
+* Concepts::            Conceptual index
+@end menu
+
+@c --------------------------------------------------------
+@node Foreword, Copying, top, top
+@comment node-name, next, previous, up
+@chapter Foreword to version 2.0
+
+er.go.nom.ics, n: The applied science of equipment design, as for
+the workplace, intended to maximize productivity by reducing operator
+fatigue and discomfort.
+
+I started working on this editor pulled along by the pure interest
+of what is behind the scenes of the text editors. I had some versions
+developed as early as my high-school years. The work is fun, it is a
+pleasure to see that somebody else uses it, and it is rewarding to try new
+features developed on your own editor. Designing for the user experience is
+the motivation that started to prevail more and more as the
+development progressed. Through this particular product I'll try to
+expose to the audience a realisation of an ergonomic console text editor.
+
+@c --------------------------------------------------------
+@node Copying, Credits, Foreword, top
+@comment node-name, next, previous, up
+@chapter Distribution License
+
+@display
+This software is distributed under the conditions of the BSD style license.
+
+Copyright
+(c) 1995-2002
+Petar Marinov
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+@end display
+
+
+@c --------------------------------------------------------
+@node Credits, new, Copying, top
+@comment node-name, next, previous, up
+@chapter Author and Credits
+
+@subheading Project start
+started: september/1995
+
+@subheading Extended copyright message
+@display
+Program and Text Copyright, ( C ) 1995-2001, Petar Marinov
+All Rights Reserved.
+Portions written by Tzvetan Mikov
+Regular expression library
+written by by Philip Hazel, University of Cambridge, England
+@end display
+
+@subheading Web site
+http://geocities.com/h2428/
+
+@subheading Petar Marinov (mar22@@usa.net)
+The author.
+
+Interests: C/C++ programming.
+
+@subheading Tzvetan Mikov (mikov@@usa.net)
+
+In this project: Contributed with a lot of ideas, suggestions of improvements,
+portions of the code, and debugging.
+
+Interests: C/C++ programming. Compilers design.
+
+@c --------------------------------------------------------
+@node new, open, Credits, top
+@comment node-name, next, previous, up
+@chapter New File
+@cindex file (new)
+
+Press Ctrl+N to create a new empty file. The file will be "noname". You
+may start typing new text. When you press Ctrl+S to save the file, you will
+be prompted to enter a name for the file to be stored to disk.
+
+@subheading See also:
+@display
+@xref{save}.
+@xref{close}.
+@end display
+
+@c --------------------------------------------------------
+@node open, open_r_only, new, top
+@comment node-name, next, previous, up
+@chapter Open File
+@cindex file (open)
+@cindex file (load)
+
+Press Ctrl+O to open file from disk for editing.
+
+"File:" prompt will appear for you to enter the file name.
+
+You may type a filename and press ENTER. If such a file
+exists, its content will be loaded in memory for you to edit,
+otherwise you will start a new file with that name.
+
+At the "File:" prompt you may just press ENTER, on an empty line,
+to open a file selection menu with the files from the current directory.
+
+You may specify path and a mask like: "/home/myname/work/*.c;*.h"
+and press ENTER to open a file selection menu only of files matching
+the mask.
+
+At the "File:" prompt you may press F4 to be prompted with
+selection of masks collected from the current set of document
+types defined in the editor.
+
+As you type, your line will incrementally change in accordance with
+previous file names you entered (Like when entering text at the URL
+line in a web browser).
+
+Press UP to examine the history. The history will be filtered
+to show only the entries that start with the substring you
+have already typed at the prompt line (press UP on an empty prompt
+to see the entire history unfiltered).
+
+Press TAB for filename completion.
+
+Press F7 to select from a complete list of filename completions.
+
+If you have no "write" permitions, yellow on red "R" character
+will appear on the status line to indicate that the file can not be edited,
+as the load completes.
+
+If you load a file that already has one copy in memory the new file
+will appear with ":2" added at its name on the status line. You will
+see a white or red "R" character to indicate that this copy can not be edited.
+
+@subheading See also:
+@display
+@xref{pline_edit}.
+@xref{new}.
+@xref{open_r_only}.
+@xref{save}.
+@end display
+
+@c --------------------------------------------------------
+@node open_r_only, close, open, top
+@comment node-name, next, previous, up
+@chapter Open File As Read-Only
+@cindex file (open)
+@cindex file (load)
+
+To execute this, activate the "File" pull down sub-menu
+and then select "Open As Read Only" operation
+(short-cut sequence: <Alt+F>, <r>).
+
+"File:" prompt will appear for you to enter the file name. The prompt
+operates as described in the File|Open page.
+
+This loads a file from disk in memory and disables editing.
+
+White on red "R" character will appear on the status line to indicate
+that the file can not be edited (although "write" privilage is granted
+for this file on disk), as the load completes.
+
+@subheading See also:
+@display
+@xref{open}.
+@xref{pline_edit}.
+@xref{new}.
+@xref{save}.
+@end display
+
+@c --------------------------------------------------------
+@node close, save, open_r_only, top
+@comment node-name, next, previous, up
+@chapter Close File
+@cindex file (close)
+
+Press Ctrl+F4 to close the current file.
+
+If the file has been changed you will be prompted to save the
+file: "Save (Y/N/ESC)?". Press <y> or <Enter> to save the file,
+<n> to discard all the changes and close the file, or <ESC>
+to cancel the close operation and return back to edit the file.
+
+@subheading See also:
+@display
+@xref{open}.
+@xref{save}.
+@end display
+
+@c --------------------------------------------------------
+@node save, saveas, close, top
+@comment node-name, next, previous, up
+@chapter Save File
+@cindex file (close)
+
+Press Ctrl+S to save a file on disk.
+
+Upon saving you may convert a file to a different end-of-line
+type, just specify this in Options|Edit options|File saving mode.
+
+If the file aready exists on disk its contents is copied in a
+"*.bak" file.
+
+@subheading See also:
+@display
+@xref{open}.
+@xref{saveas}.
+@xref{close}.
+@end display
+
+@c --------------------------------------------------------
+@node saveas, saveall, save, top
+@comment node-name, next, previous, up
+@chapter Change Name and Save File
+@cindex file (saveas)
+@cindex file (change name)
+
+To execute this, activate the "File" pull down sub-menu
+and then select "Save As" operation
+(short-cut sequence: <Alt+F>, <a>).
+
+"Save as:" prompt will appear for you to enter the file name. The prompt
+operates as described in the File|Open page.
+
+If the name you input is of a file that already exists, a
+confirmation prompt will appear "Overwrite (Y/N)?". Press
+<y> or <Enter> to save the file with this name,
+or <n> not to save the file.
+
+@subheading See also:
+@display
+@xref{open}.
+@xref{save}.
+@xref{saveall}.
+@end display
+
+@c --------------------------------------------------------
+@node saveall, recentfiles, saveas, top
+@comment node-name, next, previous, up
+@chapter Save All Changed Files
+@cindex file (saveall)
+
+To execute this, activate the "File" pull down sub-menu
+and then select "Save All" operation
+(short-cut sequence: <Alt+F>, <l>).
+
+All files in memory that have unsaved changes will be stored
+to disk.
+
+A file is indicated to have unsaved changes if in front of its
+name at the status line there is a "*" character.
+
+If the character is blue (instead of black) your last changes
+are stored in an incrementaly collected recovery file.
+
+@subheading See also:
+@display
+@xref{open}.
+@xref{save}.
+@end display
+
+@c --------------------------------------------------------
+@node recentfiles, exit, saveall, top
+@comment node-name, next, previous, up
+@chapter Show Recent Files
+
+The editor keeps a list of the most recently opened files. The
+list is accessible from within the pull-down menu: activate the
+"File" sub-menu and then select "Recent Files" (short-cut sequence:
+<Alt+F> <f>). Select a file to be loaded from this list.
+
+@subheading See also:
+@display
+@xref{open}.
+@xref{wnavigation}.
+@xref{wlist}.
+@end display
+
+@c --------------------------------------------------------
+@node exit, navigation, recentfiles, top
+@comment node-name, next, previous, up
+@chapter Quit Editor
+@cindex file (quit)
+
+Press <Alt+X> to exit the editor. For all the files that
+has unsaved changes you will be prompted individually wether
+to save or to discard the changes.
+
+@subheading See also:
+@display
+@xref{open}.
+@end display
+
+@c --------------------------------------------------------
+@node navigation, blocksel, exit, top
+@comment node-name, next, previous, up
+@chapter Cursor Navigation
+@cindex edit (navigation)
+
+Use the arrow keys to move the cursor to any adjacent character
+in the corresponding direction.
+
+Use <Home> to jump at the start of the line.
+
+Use <End> to jump at the last character of the line. Note that
+the spaces at the end of the line, are counted as valid characters.
+The cursor will show any trailing blank spaces after pressing <End>.
+
+Use <PageUp> or <PageDn> to go to the previous or the next page of
+the file.
+
+Use <Ctrl+Left> or <Ctrl+Right> to jump accordingly at the start of
+the previous or at the start of the next word in the text.
+
+Use <Ctrl+Home> or <Ctrl+End> to jump instantly at the beginning of the
+file or at the end of the file.
+
+@subheading See also:
+@display
+@xref{bookmarks}.
+@end display
+
+@c --------------------------------------------------------
+@node blocksel, block, navigation, top
+@comment node-name, next, previous, up
+@chapter Block Selection
+@cindex edit (block)
+
+To make a selection of text, hold down <Shift> while using
+the full set of the navigation keys. As you move the cursor
+the selection area will expand or contract.
+
+If you wish to do selection of a square region, press <Ctrl+Shift+F8> once.
+"COL" string will appear on the status line to indicate the change
+of the selection mode.
+
+@subheading See also:
+@display
+@xref{block}.
+@end display
+
+@c --------------------------------------------------------
+@node block, undo, blocksel, top
+@comment node-name, next, previous, up
+@chapter Block Operations
+@cindex edit (block)
+
+Cut, copy, paste. sort, uppercase, lowercase, 
+trim trailing blanks, indent, unindent, tabify,
+untabify
+
+@subheading See also:
+@display
+@xref{blocksel}.
+@xref{undo}.
+@end display
+
+@c --------------------------------------------------------
+@node undo, basic, block, top
+@comment node-name, next, previous, up
+@chapter Undo/Redo Operations
+@cindex edit (edit)
+
+Unlimited Undo/Redo and recovery file.
+
+@c --------------------------------------------------------
+@node basic, bookmarks, undo, top
+@comment node-name, next, previous, up
+@chapter Basic text input
+@cindex edit (edit)
+
+Type to enter text.
+
+@subheading See also:
+@display
+@xref{navigation}.
+@xref{undo}.
+@end display
+
+@c --------------------------------------------------------
+@node bookmarks, search, basic, top
+@comment node-name, next, previous, up
+@chapter Bookmarks
+@cindex edit (edit)
+
+Mark/Navigate bookmarks.
+
+@subheading See also:
+@display
+@xref{messages}.
+@end display
+
+@c --------------------------------------------------------
+@node search, isearch, bookmarks, top
+@comment node-name, next, previous, up
+@chapter Search And Replace
+@cindex edit (search)
+@cindex edit (replace)
+
+Press Ctrl+F to input the pattern you need to search or to search
+and replace.
+
+"Find:" prompt will appear and you can enter the search
+command. At this prompt you may enter both "search" and
+"search and replace" commands.
+
+The format of the search and replace commands follows the Perl
+language syntax.
+
+The full format of search command is:
+m/text/
+This activates the regular expression engine. You may insert
+regular expression commands and escaped charactars ('\').
+
+The short form is:
+/text/
+
+And even shorter:
+text
+This form is plain text only. The regular expressions are
+deactivated by default.
+
+You may precede the pattern with a set of options:
+
+-i  ignore the characters upper/lower case. This option
+is turned on by default so you may need to negate it ("-i-")
+to make case sensitive serach.
+
+-r  use this to indicate that the pattern contains a regular
+expression
+
+-b  start to search backward from the current cursor position,
+by default the search starts from the current cursor position
+and goes forward.
+
+Example:
+-b m/#include ".*"\n/
+Which is: case-insensitive search backward for #include "<something>"\n
+
+Same example in short form:
+-b -r "#include \".*\"\n"
+
+As a result of a search command the editor will jump at the first
+position of an occurence. The pattern will be stored as a current
+search pattern and you my use F3 if you wish to repeat the operation.
+Press Shift+F3 to initiate backward search with the current pattern.
+
+You can specify a replace operation by typing
+
+s/search_pattern/replace_text/
+
+The short format is
+/search_pattern/replace_text/
+
+Replace operation recognazies this options in addition to the match
+operation:
+
+-n  do not prompt, replace all occurences
+
+By default at each occurence you will be asked to aprove or
+discard the replace operation.
+
+By pressing Ctrl+F and activating the prompt you will see
+that the word at the current cursor position is provided as
+a suggestion for a search pattern. So you can easily search
+for a specific word by just positioning the cursor at some
+of its characters.
+
+You may directly change the current pattern with the text
+that is currently selected and initiate a search at
+the same time. Press Ctrl+F3 to search forward, or Shift+Ctrl+F3
+to search backward. If there is no selection the word under the
+cursor is used.
+
+@subheading See also:
+@display
+@xref{findinfiles}.
+@xref{isearch}.
+@xref{reguexpr}.
+@end display
+
+@c --------------------------------------------------------
+@node isearch, findinfiles, search, top
+@comment node-name, next, previous, up
+@chapter Incremental Search
+@cindex edit (search)
+
+Press Ctrl+I to activate the incremental search. You will
+immediately see "Incremenetal search:" at the status line.
+The cursor will remain at the text you currently edit.
+As you start typing the initial characters of the search pattern,
+the cursor will move to the first matching position.
+The matching portion will be highlighted and will as well
+appear on the status line.
+
+If you press ESC you will cancel the incremental search mode
+and will return at the position where you initially pressed Ctrl+I.
+
+If you
+press <Backspace> you will trim the last symbol of the
+pattern down and the cursor will move on the previous occurence
+of the pattern.
+
+If you press F3 you will jump on the next occurence of the
+pattern.
+
+If you press Shift+F3 you will jump on an occurence that is
+backward to the current cursor position.
+
+During the incremental search mode the file is searched in a closed
+loop circle. The cursor will wrap at the end of the file and will jump
+at the first occurence from the start of the file. This will be
+indicated by a message at the status line -- "<End of file passed>".
+
+If you are satisfied with the position of the current occurence, just
+use the
+arrow keys to remain there. This ends the incremental search mode.
+
+Upon termination of the incremental search mode, the pattern is
+stored as a current search pattern and can be reused by pressing
+F3 or Shift+F3. The pattern is stored in the search history
+and can be edited by entering the full pattern search -- Ctrl+F.
+
+Using incremental search is a short-cut of jumping to a
+specific text as it may be enough to type just a few of the
+initial characters of the pattern. In contrast the full scale
+search (Ctrl+F) requires you to type the full pattern before
+activating the search.
+
+Use Ctrl+Shift+I to start incremental search backward.
+
+@subheading See also:
+@display
+@xref{search}.
+@end display
+
+@c --------------------------------------------------------
+@node findinfiles, gotoln, isearch, top
+@comment node-name, next, previous, up
+@chapter Find/Replace In Files
+@cindex edit (search)
+
+Search and Replace text into files and sub-directories.
+
+@subheading See also:
+@display
+@xref{search}.
+@xref{messages}.
+@end display
+
+@c --------------------------------------------------------
+@node gotoln, reguexpr, findinfiles, top
+@comment node-name, next, previous, up
+@chapter Goto line
+@cindex edit (gotoln)
+
+Go to a specific line by number.
+
+@subheading See also:
+@display
+@xref{isearch}.
+@end display
+
+@c --------------------------------------------------------
+@node reguexpr, calc, gotoln, top
+@comment node-name, next, previous, up
+@chapter Regular Expressions
+@cindex edit (gotoln)
+
+This page is a reference guide of the regular expression
+commands and escaped characters.
+
+Each character matches itself, unless it is one of the special
+characters +?.*^$()@{[|\. The special meaning of these characters
+can be escaped by using a \.
+
+@display
+------+----
+.     | Matches any character but now new line.
+------+----
+(...) | Groups a series of pattern elements into a single
+      | element. The text the groups matches is captured for
+      | later use.
+------+----
+^     | Matches the beginning of a line.
+------+----
+$     | Matches the end of the line.
+------+----
+[...] | Denotes a class of characters to match
+------+----
+[^..] | Negates a class of characters to match
+------+----
+...|  | Matches the alternatives from left to right until
+      | one succeeds
+------+----
+?     | -- extends the meaning of '('
+      | -- 0 or 1 quantifier
+      | -- quantifier minimizer
+------+----
+*     | 0 or more quantifier
+------+----
++     | 1 or more quantifier
+------+----
+@{..@}  | min/max quantifier
+------+----
+
+A second use of backslash provides a way  of  encoding  non-printing
+characters  in patterns in a visible manner
+
+------+----
+\a    | alarm, that is, the BEL character (hex 07)
+------+----
+\cx   | "control-x", where x is any character
+------+----
+\e    | escape (hex 1B)
+------+----
+\f    | formfeed (hex 0C)
+------+----
+\n    | newline (hex 0A)
+------+----
+\r    | carriage return (hex 0D)
+------+----
+\t    | tab (hex 09)
+------+----
+\xhh  | character with hex code hh
+------+----
+\ddd  | character with octal code ddd, or backreference
+------+----
+
+The third use of backslash is for specifying generic character
+types:
+
+------+----
+\d    | any decimal digit
+------+----
+\D    | any character that is not a decimal digit
+------+----
+\s    | any whitespace character
+------+----
+\S    | any character that is not a whitespace character
+------+----
+\w    | any "word" character
+------+----
+\W    | any "non-word" character
+------+----
+
+The fourth use of backslash is  for  certain simple
+assertions:
+
+------+----
+\b    | word boundary
+------+----
+\B    | not a word boundary
+------+----
+\A    | start of subject (independent of multiline mode)
+------+----
+\Z    | end of subject or newline at  end  (independent of multiline mode)
+------+----
+\z    | end of subject (independent of multiline mode)
+------+----
+
+
+The supported class names are:
+------+----
+alnum | letters and digits
+------+----
+alpha | letters
+------+----
+ascii | character codes 0 - 127
+------+----
+cntrl | control characters
+------+----
+digit | decimal digits (same as \d)
+------+----
+graph | printing characters, excluding space
+------+----
+lower | lower case letters
+------+----
+print | printing characters, including space
+------+----
+punct | printing characters, excluding letters and digits
+------+----
+space | white space (same as \s)
+------+----
+upper | upper case letters
+------+----
+word  | "word" characters (same as \w)
+------+----
+xdigit| hexadecimal digits
+------+----
+@end display
+
+@subheading See also:
+@display
+@xref{search}.
+@xref{findinfiles}.
+@end display
+
+@c --------------------------------------------------------
+@node calc, wnavigation, reguexpr, top
+@comment node-name, next, previous, up
+@chapter Calculator
+@cindex edit (gotoln)
+
+Type an expression to get the result evaluated.
+
+@c --------------------------------------------------------
+@node wnavigation, userscr, calc, top
+@comment node-name, next, previous, up
+@chapter Windows Navigation
+@cindex edit (gotoln)
+
+You can load multiple files simultaneously in memory.
+
+Press Alt+0 to see a full list of all the files.
+
+Open the Window menu to see the last 10 files. These are
+displayed in the order of the most recently activated. So the current
+file is always at position "1", the file that was activated before
+the current is at position "2", etc.
+
+Ctrl+Tab switches among the last 2 files.
+
+If you continue to press Ctrl+Tab withouth releasing the Ctrl key you will
+navigate among the files in the order they are displayed in the "Window"
+menu. Pressing Ctrl+Shift+Tab will navigate in the oposite direction.
+
+@subheading See also:
+@display
+@xref{wlist}.
+@xref{recentfiles}.
+@end display
+
+@c --------------------------------------------------------
+@node userscr, wlist, wnavigation, top
+@comment node-name, next, previous, up
+@chapter User Screen
+@cindex edit (gotoln)
+
+Show the output screen.
+
+@subheading See also:
+@display
+@xref{search}.
+@xref{findinfiles}.
+@end display
+
+@c --------------------------------------------------------
+@node wlist, messages, userscr, top
+@comment node-name, next, previous, up
+@chapter Windows List
+@cindex edit (gotoln)
+
+Shows all the files in memory.
+
+@subheading See also:
+@display
+@xref{wnavigation}.
+@xref{recentfiles}.
+@end display
+
+@c --------------------------------------------------------
+@node messages, pline_edit, wlist, top
+@comment node-name, next, previous, up
+@chapter Messages Window
+@cindex edit (gotoln)
+
+Shows and navigates the messages generated by various
+modules like FindInFiles or Bookmarks.
+
+@subheading See also:
+@display
+@xref{findinfiles}.
+@xref{bookmarks}.
+@end display
+
+@c --------------------------------------------------------
+@node pline_edit, error_msg, messages, top
+@comment node-name, next, previous, up
+@chapter Prompt line edit keys
+@cindex file open (prompt)
+
+@subheading Functions that use the single line input prompt:
+@display
+@xref{open}.
+@xref{search}.
+@xref{findinfiles}.
+@xref{calc}.
+@end display
+
+@c --------------------------------------------------------
+@node error_msg, ini_file, pline_edit, top
+@comment node-name, next, previous, up
+@chapter Error messages, Warnings and Prompts
+@cindex file open (prompt)
+
+These pages are designed to be accessed as a context
+sensitive help. However, feel free to browse and
+read them out of context as well.
+
+@menu
+* ini_file::            Ini file errors
+* info_browser::        Info browser errors
+* errno_msg::           System error
+* save_msg::            Save file prompt
+* save_msg_e::          Save upon exit file prompt
+* ini_mem::             No memory for the ini file
+* ini_new_ver::         New version of the ini file
+* ini_unsup_ver::       Ini file of an unsuppported version
+* ini_not_stored::      Ini file will not be stored
+* no_enough_mem::       No enough memory for this operation
+* mru_no_mem::          No memory to load all the MRU files
+* rec_no_mem::          No memory to load the recovery file
+* rec_no_mem_apply::    No memory to apply the recovery file
+* rec_corrupt::         Rec file corrupted, partial recovery
+* rec_corrupt_bad::     Rec file corrupted, recovery impossible
+* rec_file_incons::     Rec file inconsistent
+* recover::             Recover file prompt
+@end menu
+
+@c --------------------------------------------------------
+@node ini_file, info_browser, error_msg, error_msg
+@comment node-name, next, previous, up
+@chapter Ini file errors
+
+This error shows failure while processing one of the
+configuration files at startup.
+
+Error in INI file may occure if the file is corrupted.
+Possible causes for corruption are: bad disk read (for
+example from a floppy disk); file edited manually; bug in the editor
+introduces incorrect syntax when the file was last written.
+
+In most of the cases the editor will ignore the line
+having invalid syntax. While you may loose config information,
+the effect is usually harmless.
+
+The most probable cause is a bug in the editor. It will be
+great if you send the broken INI file (open new
+shell session and preserve the INI file before exiting the editor
+as it will be overwritten) with some explanation of the
+circumstances how this occurred.
+
+@c --------------------------------------------------------
+@node info_browser, errno_msg, ini_file, error_msg
+@comment node-name, next, previous, up
+@chapter Info browser errors
+
+Reasons for info broser errors can be of two general types.
+
+First, this is bug in the editor. You hit a link and the editor
+can not open the destination, this most means that most likely
+the editor can not properly parse the file.
+
+Second, you really hit a link that points to a missing file.
+
+
+@c --------------------------------------------------------
+@node errno_msg, save_msg, info_browser, error_msg
+@comment node-name, next, previous, up
+@chapter System error
+
+This message represents some kind of system error. The message
+itself is supplied by the system. You have to be able
+to figure out the meaning of the message under the current
+circumstances.
+
+If you feel confused by some of the messages please
+send an e-mail explaining the situation and I will gather
+some of the messages here with possible solutions for you.
+
+
+@c --------------------------------------------------------
+@node save_msg, save_msg_e, errno_msg, error_msg
+@comment node-name, next, previous, up
+@chapter Save file prompt
+
+You are closing the current file and you have unsaved changes
+of the file in memory. You are being asked whether to save or
+to discard the changes.
+
+At the prompt "Save (Y/N/ESC)":
+
+Press <Y> (or <Enter>) for "yes". The changes will be stored
+to disk and the file will be removed from memory.
+
+Press <N> for "no". The file will be removed from memory and
+your editings will be lost. The file will remain unchanged on the disk.
+
+Press <Esc> to cancel the operation. Your file will remain in
+memory and you can continue editing.
+
+
+@c --------------------------------------------------------
+@node save_msg_e, ini_mem, save_msg, error_msg
+@comment node-name, next, previous, up
+@chapter Save upon exit file prompt
+
+You are exiting the editor and you have unsaved changes in some
+of the files that are in memory. You are being asked whether
+to save or to discard the changes separately for every file
+that is unsaved.
+
+At the prompt "Save _filename_ (Y/N/ESC)":
+
+Press <Y> (or <Enter>) for "yes". The changes will be stored
+to disk and the file will be removed from memory.
+
+Press <N> for "no". The file will be removed from memory and
+your editings will be lost. The file will remain unchanged on the disk.
+
+Press <Esc> to cancel the operation. Your file will remain in
+memory and you can continue editing.
+
+
+@c --------------------------------------------------------
+@node ini_mem, ini_new_ver, save_msg_e, error_msg
+@comment node-name, next, previous, up
+@chapter No memory for the ini file
+
+@c --------------------------------------------------------
+@node ini_new_ver, ini_unsup_ver, ini_mem, error_msg
+@comment node-name, next, previous, up
+@chapter New version of the ini file
+
+@c --------------------------------------------------------
+@node ini_unsup_ver, ini_not_stored, ini_new_ver, error_msg
+@comment node-name, next, previous, up
+@chapter Ini file of an unsuppported version
+
+@c --------------------------------------------------------
+@node ini_not_stored, no_enough_mem, ini_unsup_ver, error_msg
+@comment node-name, next, previous, up
+@chapter Ini file will not be stored
+
+@c --------------------------------------------------------
+@node no_enough_mem, mru_no_mem, ini_not_stored, error_msg
+@comment node-name, next, previous, up
+@chapter No enough memory for this operation
+
+@c --------------------------------------------------------
+@node mru_no_mem, rec_no_mem, no_enough_mem, error_msg
+@comment node-name, next, previous, up
+@chapter No memory to load all the MRU files
+
+@c --------------------------------------------------------
+@node rec_no_mem, rec_no_mem_apply, mru_no_mem, error_msg
+@comment node-name, next, previous, up
+@chapter No memory to load the recovery file
+
+@c --------------------------------------------------------
+@node rec_no_mem_apply, rec_corrupt, rec_no_mem, error_msg
+@comment node-name, next, previous, up
+@chapter No memory to apply the recovery file
+
+@c --------------------------------------------------------
+@node rec_corrupt, rec_corrupt_bad, rec_no_mem_apply, error_msg
+@comment node-name, next, previous, up
+@chapter Rec file corrupted, partial recovery
+
+@c --------------------------------------------------------
+@node rec_corrupt_bad, rec_file_incons, rec_corrupt, error_msg
+@comment node-name, next, previous, up
+@chapter Rec file corrupted, recovery impossible
+
+@c --------------------------------------------------------
+@node rec_file_incons, recover, rec_corrupt_bad, error_msg
+@comment node-name, next, previous, up
+@chapter Rec file inconsistent
+
+@c --------------------------------------------------------
+@node recover, Anouncements, rec_file_incons, error_msg
+@comment node-name, next, previous, up
+@chapter Recover file prompt
+
+@c --------------------------------------------------------
+@node Anouncements, Concepts, recover, top
+@comment node-name, next, previous, up
+@chapter Anouncements
+
+@menu
+What's new in:
+* build14::             Whats new in build 14
+
+Tips and tricks
+* tip1::                Welcome
+* tip2::                Find/Replace
+* tip3::                Sort
+* tip4::                Filename auto-completion
+* tip5::                A wagon full of tapes
+* tip6::                Messages window
+* tip7::                Filename hint
+* tip8::                FindInFiles match navigation
+* tip9::                Clipboard history
+* tip10::               Convert text files
+* tip11::               Context sensitive help
+
+@end menu
+
+@c --------------------------------------------------------
+@node build14, tip1, , Anouncements
+@comment node-name, next, previous, up
+@chapter What's new in build 14
+
+A lot of bug fixes (yes, this product still proves usable only
+for extremists). Thank you for still using these experimental
+versions. The evaluation feedback, the bug reports, and the stable
+flow of ideas keeps the developing in progress. (Tzvetan, call me
+up we need to discuss some details).
+
+@subheading Features:
+
+* Notably, an on-line help system is added. This lovely screen
+is harnessing the immense power of the new module. I hope
+there are no many bugs lurking ... we'll see.
+
+* Tips and Tricks, you'll see them tomorrow. They'll appear
+only once a day. I'll try to be witty (hardly possible but I'll
+try hard) by comming up with clever and useful set of tips for
+you to read (having a cup of coffe in the morning while reading
+your daily dose is highly recomended)
+
+* "File:" prompt menu allows groups of masks to be specified,
+like "*.c;*.h;*.cpp" for example
+
+* At "File:" input line use F4 to invoke the menu of the documents
+to select a predefined mask
+
+* A global INI file is created. Now some of the options are
+submitted to this central storage.
+
+* Search supports perl regular expressions.
+
+@c --------------------------------------------------------
+@node tip1, tip2, build14, Anouncements
+@comment node-name, next, previous, up
+@chapter tip1
+
+Welcome to the "Tips and Tricks" section.
+
+A page with a new tip or trick will appear the first time
+you start the editor. It will show only once each day.
+
+Some (Tzvetan) may find this feature annoying so this first
+tip teaches you how to turn the "Tips and Tricks"
+section off.
+
+Open wglob.ini. This file usually resides in the directory
+where the w.exe binary is installed. On UNIX derivatives $HOME
+specifies explicitely the place.
+
+In the file look for [Global] section and set both
+the keys to -1. Save the file.
+
+End of Tip1. Press <ESC> to close the page.
+
+@c --------------------------------------------------------
+@node tip2, tip3, tip1, Anouncements
+@comment node-name, next, previous, up
+@chapter tip2
+
+Do you know that:
+
+at the "Find:" prompt (activated by Ctrl+F) you can specify
+a replace pattarn in format s/search_pattern/replace_pattern/
+
+@subheading For details:
+@display
+@xref{search}.
+@end display
+
+@c --------------------------------------------------------
+@node tip3, tip4, tip2, Anouncements
+@comment node-name, next, previous, up
+@chapter tip3
+
+Do you know that:
+
+Edit|Block|Sort uses the current column selection as a key
+for sorting.
+
+@subheading For details:
+@display
+@xref{search}.
+@end display
+
+@c --------------------------------------------------------
+@node tip4, tip5, tip3, Anouncements
+@comment node-name, next, previous, up
+@chapter tip4
+
+Do you know that:
+
+At the "File:" input prompt (Ctrl+O) you can press Tab
+for completing partially typed file name. Use F7 to
+display a full list of suggestions.
+
+@subheading For details:
+@display
+@xref{open}.
+@end display
+
+@c --------------------------------------------------------
+@node tip5, tip6, tip4, Anouncements
+@comment node-name, next, previous, up
+@chapter tip5
+
+"Never underestimate the bandwidth of a station wagon full
+of tapes."
+
+Dr. Warren Jackson, Director, UTCS
+
+@c --------------------------------------------------------
+@node tip6, tip7, tip5, Anouncements
+@comment node-name, next, previous, up
+@chapter tip6
+
+Do you know that:
+You can use messages window (Window|Messages or Alt+2 shortcut)
+to fast access the last of the activated FindInFiles windows
+or Bookmarks window.
+
+FindInFiles: when you press <Enter> to visit a selected occurrence
+the FindInFiles window closes to make room for a fullscreen display
+of the file. Press Alt+2 to jump back to the occurences list.
+
+(same is valid for the Bookmarks window)
+
+
+@c --------------------------------------------------------
+@node tip7, tip8, tip6, Anouncements
+@comment node-name, next, previous, up
+@chapter tip7
+
+Do you know that:
+At the "File:" input prompt (Ctrl+O) you can press F4 to
+invoke a suggestion menu of file masks. These masks are
+collected among all the document types defined in the editor.
+
+
+@c --------------------------------------------------------
+@node tip8, tip9, tip7, Anouncements
+@comment node-name, next, previous, up
+@chapter tip8
+
+Do you know that:
+You can press F4 and Shift+F4 to move to the next and previous
+match listed in FindInFiles window.
+
+@c --------------------------------------------------------
+@node tip9, tip10, tip8, Anouncements
+@comment node-name, next, previous, up
+@chapter tip9
+
+Do you know that:
+You can use Ctrl+Shift+V to paste from previous clipboard
+contents.
+
+@c --------------------------------------------------------
+@node tip10, tip11, tip9, Anouncements
+@comment node-name, next, previous, up
+@chapter tip10
+
+Do you know that:
+You can convert the end-of-file type of a file upon saving
+it to disk. Prior saving the file select the desired type from
+the menu at "Options|Edit options|File saving mode (end-of-line)",
+this setting will remain until you end the current editor session.
+
+@subheading For details:
+@display
+@xref{save}.
+@end display
+
+@c --------------------------------------------------------
+@node tip11, , tip10, Anouncements
+@comment node-name, next, previous, up
+@chapter tip11
+
+Do you know that:
+You can get context-sensitive help for most of the editor
+features by pressing the F1 key at any time. This works
+at the menus, too. You can also ask for help when any error message
+is displayed.
+
+@c --------------------------------------------------------
+@node Concepts, , Anouncements, Top
+@c node-name, next, previous, up
+@ifclear DOC
+@unnumbered Concept Index
+@printindex cp
+
+@contents
+@end ifclear
+@bye
+

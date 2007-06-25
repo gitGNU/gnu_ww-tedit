@@ -1,0 +1,10 @@
+control	keycode  15 = Tab
+control	shift keycode  15 = Tab
+control keycode  23 = F30
+control shift keycode  23 = F30
+control keycode  26 = F31
+control	shift keycode 61 = F3
+control	shift keycode 66 = F8
+string F30 = "\033[[F"
+string F31 = "\033[[G"
+

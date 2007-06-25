@@ -1,0 +1,107 @@
+15-12-99:
+* Yesterday I was trying to find a portable way to trap all floating point 
+and integer errors (division by zero, overflow, etc.).
+Unfortunaley there seems not to be an ellegant solution that works for all
+compilers that I can test with. I will have to use compiler/platform 
+specific codes.
+In all compilers the floating point exceptions (if enabled at all) can be 
+trapped with "signal( SIGFPE, ... )". In all of them except VC6.0, this 
+also traps the integer division by zero.
+
+Another problem are the math library functions. In some compilers
+they just set errno, in others they call _matherr() or matherr() and
+set errno only if _matherr() returns 0. Unfortunately in that case
+(_matherr() returning 0) an error message is also printed!
+
+
+Here is the summary of the default behaviour and the options by compiler:
+
+- VC 6.0
+By default no floating point exceptions are enabled. They can be enabled
+with _control87() and then they can be trapped with signal(SIGFPE).
+Integer division by zero causes an exception that can't be trapped with 
+signal(SIGFPE). The code that maps the Win32 structured exception 
+STATUS_INTEGER_DIVIDE_BY_ZERO to a "raise( SIGFPE )" was commented 
+out in MSVCRT for unknown reasons. This can be worked around by catching 
+the exception explicitly:
+	__try 
+	{
+	  ....
+	}
+	__except ( GetExceptionCode() == STATUS_INTEGER_DIVIDE_BY_ZERO ?
+                   (raise( SIGFPE ), -1) : 0 )
+	{
+	};
+
+Library functions call _matherr().
+
+- CBuilder 3.0
+Floating point exceptions are enabled by default. They can be trapped with
+signal(SIGFPE). This also works for integer division by zero.
+If necessary floating point exceptions canbe disabled with _control87().
+
+Library functions call _matherr(). 
+
+- Borland C 3.1
+Floating point exceptions are enabled by default. They can be trapped with
+signal(SIGFPE). This also works for integer division by zero.
+If necessary floating point exceptions canbe disabled with _control87().
+
+Library functions call matherr().
+
+- Linux GCC (I don't know which version)
+I took only a brief look at it.
+Floating point are not enabled by default and I could not find a way
+to enable them.
+Integer division by zero causes a SIGFPE which can be trapped.
+
+Library functions set errno.
+
+- DJGPP
+At least with the version I am using (2.something) and under WinNT, 
+the programs crash on a floating point error. I don't have time to
+switch to DOS/WIN9X to test it!
+
+Library functions call matherr or set errno.
+Apparently POSIX works without matherr.
+
+To recapitulate: even for the same CPU (x86) every compiler behaves
+differently! Never talk to me about POSIX or ANSI or whatever!
+
+
+Here is what I will do: I will be trying to catch as much errors as
+possible using signal(SIGFPE), matherr() and Win32 structured exception
+handling. This is the most effective way because it removes the need
+for explicit checking of the operands or the value of errno after a
+math library function call.
+For the compilers/platforms that do not support this, I shall code
+the checks explicitly. For example if a platform/compiler doesn't generate
+an exception on integer division by zero, we can check the operands before
+the operation!
+
+
+05-01-00:
+
+* I decided to use exactly the opposite approach for handling the math 
+exceptions. We try to disable them whenever it is possible or we know how
+to do it. At the same time we set the signal handlers, so that in case the
+exceptions are still enabled we will still handle them.
+
+Another good option is to use COCOM's IEEE package that will always 
+give us predictable and consistent results. This is not really necessary
+in this case because we aren't very concerned with the IEEE compliance
+or consistent behaviour for the exceptional cases.
+
+12-01-00:
+* Well, the calculator (except the output formating) is functional now.
+I have to documnet the source.
+* It seems that an arbitrary length integer arithmetic would be a 
+fine addition. Quite often 32 bits are not enough for a quick integer
+computation. The question is : is this really necessary? Couldn't flating
+point be used instead? Well, not always: one can never be sure when and
+where the rounding error occurs...
+
+13-01-00:
+* I made sure that the calculator modules export only symbols starting
+with fcalc_ (including the standard publics from the scanner and parser). 
+This way there is less chance of clash.
