@@ -1,3 +1,62 @@
+commit 0ae80499d2ba97d13e75748df5d494976e2b98b5
+Author: Petar Marinov <lotzmana@safe>
+Date:   Mon Jun 25 14:19:24 2007 -0700
+
+    New terminal-friendly key mappings
+
+    Add new ergonomical key mappings which should work on most terminals.
+    The new key mappings begin with a Ctrl+key sequence, where usually the
+    key is in the left part of the keyboard (easy to combine with Ctrl).
+
+    List of new keys:
+    Ctrl+K left => home
+    Ctrl+K right => end
+
+    Ctrl+E => block mark mode
+    Ctrl+L => find next
+
+    Ctrl+D M => enter debug monitor
+    Ctrl+D E => column block mode
+    Ctrl+D I => incremental search
+    Ctrl+D L => find previous
+    Ctrl+D right => next word
+    Ctrl+D left => prev word
+    Ctrl+D home => top of file
+    Ctrl+D end => bottom of file
+
+    Ctrl+B B => bookmark toggle
+    Ctrl+B down => next bookmark
+    Ctrl+B up => prev bookmark
+
+    Signed-off-by: Tzvetan Mikov <tmikov@gmail.com>
+
+ src/keyset.c |   18 +++++++++++++++++-
+ 1 files changed, 17 insertions(+), 1 deletions(-)
+
+commit cf6d2bf72cf168b82cf375fe925534f16a102425
+Author: Tzvetan Mikov <tmikov@gmail.com>
+Date:   Mon Jun 25 14:09:51 2007 -0700
+
+    x_kbd.c: fixes for kb_del and kb_ins form numpad
+
+    Key mappings to support numpad del and ins under X11. The old file
+    which we had for this was for a different version and would not compile,
+    so I just took the two lines from it and added them to the source.
+
+    Signed-off-by: Tzvetan Mikov <tmikov@gmail.com>
+
+ src/x_kbd.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+commit af0d192d5d8dbbdc584c38b078045535a307ae71
+Author: Tzvetan Mikov <tmikov@gmail.com>
+Date:   Mon Jun 25 13:59:30 2007 -0700
+
+    .gitignore for the output directories
+
+ .gitignore |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
+
 2005-10-12 21:38  lotzmana
 
 	* src/x_kbd.c: remove residual TRACE

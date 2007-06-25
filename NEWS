@@ -1,3 +1,12 @@
+--- version 0.2.3 build 51 --- [ 2007-06-25 ]
+Petar Marinov (1):
+      New terminal-friendly key mappings
+
+Tzvetan Mikov (2):
+      .gitignore for the output directories
+      x_kbd.c: fixes for kb_del and kb_ins form numpad
+
+
 --- version 0.2.3 build 50 --- [ 2006-02-14 ]
 . [bug #15293] option UseTabs has no effect when turned off
 . X GUI: window didn't show correct title
