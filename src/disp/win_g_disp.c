@@ -31,7 +31,7 @@ prototype of assert.
 #include <stdio.h>
 #include <malloc.h>
 #include "disp.h"
-#include "win_g_p.h"
+#include "p_win_g.h"
 
 static char disp_id[] = "disp-lib";
 
@@ -166,6 +166,7 @@ void disp_done(dispc_t *disp)
   ASSERT(VALID_DISP(disp));
   _disp_ev_q_done(disp);
   _disp_free_char_buf(disp);
+  _disp_done(disp);
 
   #ifdef _DEBUG
   memset(disp, -1, sizeof(dispc_t));
@@ -1838,6 +1839,12 @@ _disp_wnd_proc(HWND hWnd,
       _disp_on_key(disp, message, (unsigned)wParam, (unsigned)lParam);
       break;
 
+    case WM_TIMER:
+      disp_event_clear(&ev);
+      ev.t.code = EVENT_TIMER_5SEC;
+      _disp_ev_q_put(disp, &ev);
+      break;
+
     case WM_CLOSE:
       break;
 
@@ -2006,7 +2013,28 @@ int _disp_init(dispc_t *disp)
 
   UpdateWindow(disp->wnd);
 
+  /* set timer for 5 seconds */
+  disp->win32_timer_id = SetTimer(disp->wnd, 1, 5000, NULL);
+  if (disp->win32_timer_id == 0)
+  {
+    disp->code = DISP_FAILED_TIMER_SETUP;
+    _snprintf(disp->error_msg, sizeof(disp->error_msg),
+              "failed to setup a timer");
+    _disp_translate_os_error(disp);
+    return 0;
+  }
+
   return TRUE;
+}
+
+/*!
+@brief platform specific disp cleanup (win32 GUI)
+
+@param disp  a display object
+*/
+void _disp_done(dispc_t *disp)
+{
+  KillTimer(disp->wnd, disp->win32_timer_id);
 }
 
 /*!

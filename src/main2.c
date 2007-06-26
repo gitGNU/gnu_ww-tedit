@@ -766,6 +766,10 @@ static void HandleEvent(disp_event_t *ev, void *ctx)
       break;
     */
 
+    case EVENT_TIMER_5SEC:
+      debug_trace("TIMER");
+      break;
+
     case EVENT_KEY:
       wrkspace_store_shift_state(ev_data->wrkspace,
                                  ev->e.kbd.shift_state,

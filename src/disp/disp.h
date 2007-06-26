@@ -66,6 +66,8 @@ enum disp_error
   DISP_FAILED_TO_POSITION_WINDOW,
   /*! message loop failure */
   DISP_MESSAGE_LOOP_FAILURE,
+  /*! failed to set a timer */
+  DISP_FAILED_TIMER_SETUP,
 };
 
 void disp_error_get(dispc_t *disp, enum disp_error *code,
