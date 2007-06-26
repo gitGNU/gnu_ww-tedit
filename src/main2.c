@@ -759,9 +759,12 @@ static void HandleEvent(disp_event_t *ev, void *ctx)
 
   switch (ev->t.code)
   {
+    /*
+    TODO: enable recovery file times
     case EVENT_RECOVERY_TIMER_EXPIRED:
       FileListForEach(pFilesInMemoryList, StoreRecoveryRecord2, FALSE, NULL);
       break;
+    */
 
     case EVENT_KEY:
       wrkspace_store_shift_state(ev_data->wrkspace,

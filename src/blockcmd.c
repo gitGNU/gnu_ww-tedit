@@ -592,7 +592,7 @@ void ExamineKey(void *pCtx, DWORD dwKey, BOOLEAN bAutoIncrementalMode)
     return;
 
   if (bAutoIncrementalMode && !bIncrementalSearch)
-    CmdEditIncrementalSearch(pFile);
+    CmdEditIncrementalSearch(pCtx);
 
   if (bIncrementalSearch)
   {
