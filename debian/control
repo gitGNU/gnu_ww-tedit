@@ -1,0 +1,12 @@
+Source: ww
+Section: devel
+Priority: optional
+Maintainer: Tzvetan Mikov <tmikov@gmail.com>
+Build-Depends: debhelper (>= 4.0.0), libc6-dev, libncurses5-dev, libx11-dev, libxft-dev
+Standards-Version: 3.6.1
+
+Package: ww
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: WW is an efficient programmers editor
+ WW is an efficient programmers editor.
