@@ -162,10 +162,12 @@ void CmdEditPageUpExtend(void *pCtx)
 void CmdEditPageDownExtend(void *pCtx)
 {
   TFile *pCurFile;
+  dispc_t *disp;
 
   pCurFile = CMDC_PFILE(pCtx);
   BeginBlockExtend(pCurFile);
-  GotoPageDown(pCurFile, disp_wnd_get_height(0) - 1);
+  disp = wrkspace_get_disp(CMDC_WRKSPACE(pCtx));
+  GotoPageDown(pCurFile, disp_wnd_get_height(disp) - 1);
   EndBlockExtend(pCurFile);
 }
 

@@ -767,7 +767,6 @@ static void HandleEvent(disp_event_t *ev, void *ctx)
     */
 
     case EVENT_TIMER_5SEC:
-      debug_trace("TIMER");
       break;
 
     case EVENT_KEY:
