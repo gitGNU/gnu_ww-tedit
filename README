@@ -1,0 +1,29 @@
+WW is a programmer's text editor. It features small
+memory and disk requirements, syntax highlighting, multiple simultaneous file
+editing, and more. It can be compiled for Linux / Unix (text console), and
+GUI emulated console for X and MS Windows.
+
+Prepare ChangeLog:
+cvs2cl.pl --fsf
+
+Tips for using WW in a text terminal
+
+There are different levels of limitations depending on the terminal emulation
+The best terminal emulation is xterm, it transmits most of the useful key
+combinations. Every other terminal is with varying degree of limitations.
+
+-- If Alt combinations doesn't work, use ESC to invoke menu, then
+   two or three shortcut letter. For example search function is Esc-s-u
+-- Ctrl+tab doesn't work, use Ctrl+F6 to switch between the top two files
+-- To switch among other files use atl+0 or Alt+W
+-- If ctrl+F6 doesn't work, use the equivalent Alt+W-2
+-- Shift+arrors must work in xterm, if it doesn't then use F8
+-- Ctrl+K-b, Ctrl+k-k also works for selections
+-- Ctrl+Shift+F8 must work to switch to column blocks, if it doesn't
+   then use Ctrl+k-n
+-- To indent blocks use Tab as usual, to unindent use Ctrl+k-u
+
+Build deps on linux
+--x11: xlibs-dev, libxft-dev
+--text: ncurses-dev
+

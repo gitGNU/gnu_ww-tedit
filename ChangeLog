@@ -1,0 +1,665 @@
+2005-10-12 21:38  lotzmana
+
+	* src/x_kbd.c: remove residual TRACE
+
+2005-10-12 21:36  lotzmana
+
+	* Makefile, NEWS, TODO, src/block.c, src/block.h, src/blockcmd.c,
+	  src/contain.c, src/contain.h, src/diag.c, src/file.h,
+	  src/fview.c, src/gui_kbd.c, src/ini2.c, src/kbd.h, src/l_kbd.c,
+	  src/main2.c, src/palette.c, src/scr.h, src/w_kbd.c,
+	  src/wrkspace.c, src/wrkspace.h, src/x_kbd.c, src/x_scr.c,
+	  src/xclip.c, src/xclip.h, src/xscr_i.h, src/py_syntax/makefile:
+	  xft fonts, x clipboard
+
+2005-06-22 23:39  lotzmana
+
+	* NEWS, TODO, src/findf.c, src/l_kbd.c, src/main2.c, src/search.c,
+	  src/search.h, src/searchf.c: build 46 numerous bug fixes in
+	  search operation
+
+2005-06-21 23:41  lotzmana
+
+	* NEWS: [no log message]
+
+2005-06-21 23:38  lotzmana
+
+	* src/xclip.c: clipboard manipulation functions for X Window
+
+2005-06-21 23:37  lotzmana
+
+	* Makefile, src/keyset.c, src/l_kbd.c, src/l_scr.c, src/main2.c,
+	  src/palette.c, src/searcmd.c, src/x_scr.c: improved keydefs for
+	  xterm
+
+2005-06-14 22:32  lotzmana
+
+	* NEWS, src/blockcmd.c, src/enterln.c, src/hypertvw.c, src/ini2.c,
+	  src/ini2.h, src/main2.c, src/nav.c, src/nav.h, src/navcmd.c:
+	  fixes #12309
+
+2005-06-01 22:31  lotzmana
+
+	* ChangeLog: chlog checkedin
+
+2005-06-01 22:29  lotzmana
+
+	* NEWS, src/doctype.c, src/ini2.c, src/ini2.h, src/main2.c: fixed
+	  #12311
+
+2005-06-01 14:51  mikov
+
+	* extra/ww: use exec to start ww_g/ww_con
+
+2005-05-31 17:31  mikov
+
+	* extra/ww: Pass command line to ww_g/ww_con
+
+2005-05-26 23:08  lotzmana
+
+	* ChangeLog: chlog update
+
+2005-05-26 23:00  lotzmana
+
+	* src/: bookm.c, bookmcmd.c, fnavcmd.c, heapg.c, ini2.c, main2.c:
+	  fixed #12196
+
+2005-05-26 22:48  lotzmana
+
+	* NEWS: fixed #12196
+
+2005-05-26 18:49  mikov
+
+	* src/: gui_scr.c, ini2.c, l_scr.c, scr.h: Rename Font to FontName
+	  to avoid collision with X.h
+
+2005-05-24 21:55  lotzmana
+
+	* NEWS, src/diag.c, src/file2.c, src/ini.c, src/ini2.c, src/ini2.h,
+	  src/l1def.c, src/l1def.h: fixed #12745
+
+2005-05-17 22:09  lotzmana
+
+	* NEWS, TODO, src/fnavcmd.c, src/gui_kbd.c, src/main2.c,
+	  src/main2.h: fixed #12275
+
+2005-05-11 22:07  lotzmana
+
+	* NEWS, src/block.c, src/diag.c, src/l_kbd.c, src/l_scr.c,
+	  src/main2.c: fixed #12883
+
+2005-05-10 23:44  lotzmana
+
+	* src/diag.c: vc compile err
+
+2005-05-10 23:42  lotzmana
+
+	* NEWS, README, src/diag.c, src/l_kbd.c, src/l_scr.c, src/main2.c:
+	  fixed #11807,#12976,#13000
+
+2005-05-04 23:55  lotzmana
+
+	* Makefile, NEWS, src/global.h, src/ini.c, src/ini2.c, src/l_kbd.c,
+	  src/l_scr.c, src/main2.c, src/palette.c, src/search.c,
+	  src/undo.c: fixed #12975,#9597
+
+2005-04-27 22:01  lotzmana
+
+	* src/bookm.c, src/bookmcmd.c, src/file.h, src/gui_scr.c,
+	  src/main2.c, src/search.c, src/search.h, NEWS: fixed #12198
+
+2005-04-19 22:36  lotzmana
+
+	* src/main2.c: build 38
+
+2005-04-19 22:35  lotzmana
+
+	* NEWS, src/gui_kbd.c, src/gui_scr.c: fixes #6389
+
+2005-04-18 21:59  lotzmana
+
+	* src/: defs.c, defs.h, gui_scr.c, ini.c, ini2.c, ini2.h, l1def.c,
+	  l1def.h, main2.c: store screen geometry in wglob.ini
+
+2005-03-31 22:23  lotzmana
+
+	* NEWS, src/block.c, src/gui_scr.c, src/ini2.c, src/l1def.c,
+	  src/scr.h: fixes #11416
+
+2005-03-22 21:40  lotzmana
+
+	* ChangeLog, NEWS, src/block.c, src/enterln.c, src/file2.c,
+	  src/history.c, src/history.h, src/ini.c, src/ini.h, src/ini2.c,
+	  src/ini2.h, src/main2.c, src/menudat.c, src/mru.c, src/mru.h,
+	  src/search.c: flexible .ini sections management
+
+2005-02-16 19:30  lotzmana
+
+	* NEWS, src/file2.c, src/filecmd.c: fixes #10641, #11893, #11273
+
+2005-02-14 21:59  lotzmana
+
+	* ChangeLog, NEWS, src/contain.c, src/filenav.c, src/filenav.h,
+	  src/gui_kbd.c, src/gui_scr.c, src/main2.c: fixes #11914, #11941
+
+2005-02-09 15:25  mikov
+
+	* src/gui_kbd.c: .fixed keyboard support for Tab and Backspace
+
+2005-02-08 21:57  lotzmana
+
+	* NEWS, src/doctype.c, src/doctype.h, src/gui_kbd.c, src/ini2.c,
+	  src/l1def.c, src/l1def.h, src/main2.c, src/menudat.c,
+	  src/palette.c, src/w_kbd.c, src/py_syntax/py_syntax.c: fixes
+	  #11334, #11576, #11635, #11905
+
+2005-01-16 22:07  lotzmana
+
+	* src/main2.c: setting new version 0.2.2 in main.c
+
+2005-01-16 21:52  lotzmana
+
+	* NEWS, src/w_scr.c: updating NEWS for build 34
+
+2005-01-16 21:44  lotzmana
+
+	* src/: parslogs.c, parslogs.h: adding files parslogs.c/.h
+
+2005-01-16 21:42  lotzmana
+
+	* src/py_syntax/: py_synh.c, py_synh.l, py_syntax.c, py_syntax.h,
+	  py_syntax2.h: adding directories and files for py_syntax
+
+2005-01-16 21:41  lotzmana
+
+	* Makefile, NEWS, src/bookmcmd.c, src/bookmcmd.h, src/contain.c,
+	  src/debug.c, src/fnavcmd.c, src/fnavcmd.h, src/gui_kbd.c,
+	  src/gui_scr.c, src/keyset.c, src/keyset.h, src/l1def.c,
+	  src/l1def.h, src/l_scr.c, src/main2.c, src/menudat.c,
+	  src/palette.c, src/scr.c, src/scr.h, src/w_scr.c, src/wrkspace.c,
+	  src/wrkspace.h, src/x_scr.c, win_proj/ww.dsp: patches #3566,
+	  #3636, #3638
+
+2004-11-11 21:30  lotzmana
+
+	* src/: block.c, block.h, blockcmd.c, main2.c: added: hidden block
+	  is created whenever {} are highlighted
+
+2004-11-09 21:38  lotzmana
+
+	* NEWS, src/gui_kbd.c, src/gui_scr.c, src/main2.c, src/searchf.c:
+	  fix #6483
+
+2004-11-07 21:39  lotzmana
+
+	* NEWS, TODO, src/main2.c, src/c_syntax/funcs.c: heuristic
+	  autoindent detection for .c files
+
+2004-11-01 21:25  lotzmana
+
+	* NEWS, src/block.c, src/bookm.c, src/main2.c: various fixes --
+	  autoindent on paste
+
+2004-10-28 21:40  lotzmana
+
+	* NEWS, src/block.c, src/bookm.c, src/filecmd.c, src/main2.c,
+	  src/searchf.c, src/c_syntax/funcs.c: fix #10653, #10658, #10666
+
+2004-10-10 22:27  lotzmana
+
+	* src/block.c: fix delete-char bug
+
+2004-10-10 20:52  lotzmana
+
+	* ChangeLog, NEWS, src/block.c, src/block.h, src/edit.c: fix #10523
+
+2004-09-30 22:37  lotzmana
+
+	* NEWS, src/block.c, src/block.h, src/edit.c, src/main2.c,
+	  src/c_syntax/funcs.c: fix #10328, #10534, #10535
+
+2004-09-27 21:17  lotzmana
+
+	* TODO, src/c_syntax/funcs.c: paste with autoindent for C files,
+	  phase 2
+
+2004-09-27 21:14  lotzmana
+
+	* NEWS, src/block.c, src/doctype.c, src/main2.c,
+	  src/c_syntax/funcs.c: paste with autoindent for C files
+
+2004-09-23 22:49  lotzmana
+
+	* TODO, src/block.c, src/block.h, src/blockcmd.c, src/doctype.c,
+	  src/doctype.h, src/edinterf.c, src/main2.c, src/synh.h,
+	  src/c_syntax/c_syntax.c, src/c_syntax/c_syntax2.h,
+	  src/c_syntax/funcs.c: paste-autoindent phase1
+
+2004-09-21 21:27  lotzmana
+
+	* NEWS, src/bookm.c, src/main2.c, src/c_syntax/funcs.c,
+	  src/c_syntax/synh.c, src/c_syntax/synh.l: fixed #9210, #10404,
+	  #10402, #10403
+
+2004-09-14 21:17  lotzmana
+
+	* TODO, src/edinterf.c, src/main2.c, src/synh.h,
+	  src/c_syntax/funcs.c: added '}' autoformatting
+
+2004-09-07 20:11  lotzmana
+
+	* NEWS, src/bookm.c, src/bookm.h, src/filenav.c, src/global.h,
+	  src/searchf.c: changes Search|Functions rendering
+
+2004-08-30 21:44  lotzmana
+
+	* src/main2.c: build 22
+
+2004-08-30 21:39  lotzmana
+
+	* src/: bookm.c, diag.c, file.c, file.h, filecmd.c, fview.c,
+	  main2.c, main2.h, palette.c, palette.h, searchf.c, searcmd.c,
+	  synh.h, wline.c, wline.h: fix: #9711
+
+2004-08-26 21:55  lotzmana
+
+	* ChangeLog, NEWS, src/main2.c, src/searchf.c, src/tarray.h,
+	  src/c_syntax/funcs.c: fix: #9118, ##9135
+
+2004-08-23 22:41  lotzmana
+
+	* NEWS, src/fview.h, src/search.c, src/c_syntax/synh.c,
+	  src/c_syntax/synh.l: fix: #9994, #9915, #9845
+
+2004-08-04 22:22  lotzmana
+
+	* NEWS, src/bookm.c, src/search.c, src/search.h, src/searcmd.c:
+	  fix: #9844, #9706
+
+2004-07-27 21:42  lotzmana
+
+	* NEWS, src/main2.c: fix: #9680, #9071
+
+2004-07-25 13:46  lotzmana
+
+	* NEWS, TODO, src/search.c, src/searcmd.c: update of TODO and a
+	  bugfix
+
+2004-07-20 21:25  lotzmana
+
+	* ChangeLog, NEWS, src/search.c: fix: #7496, #6992
+
+2004-07-19 20:47  lotzmana
+
+	* NEWS, src/filecmd.c, src/search.c, src/search.h, src/searcmd.c:
+	  fix: #9590, #9591, #9633
+
+2004-07-14 22:54  lotzmana
+
+	* ChangeLog, NEWS, src/bookm.c, src/bookm.h, src/bookmcmd.c: fix:
+	  deletion of a line with bookmarks might result in a crash
+
+2004-07-12 22:21  lotzmana
+
+	* NEWS, src/searchf.c: fix: endless duplication of func-name in
+	  search-func window
+
+2004-07-07 22:13  lotzmana
+
+	* NEWS, src/filecmd.c, src/search.c, src/search.h, src/searcmd.c:
+	  fix: replace followed by incrm search leads to crash
+
+2004-07-05 22:38  lotzmana
+
+	* NEWS, src/main2.c, src/synh.h, src/c_syntax/funcs.c: scrolling
+	  with hints
+
+2004-07-05 18:47  lotzmana
+
+	* NEWS, src/calccmd.c, src/file2.c, src/file2.h, src/filecmd.c:
+	  fixes #9381, #9070, #6388
+
+2004-06-30 20:57  lotzmana
+
+	* ChangeLog, NEWS: mark build 0.2.21
+
+2004-06-30 20:55  lotzmana
+
+	* src/: main2.c, wline.c, c_syntax/funcs.c: {} tooltips, part II
+
+2004-06-28 22:06  lotzmana
+
+	* src/: edinterf.c, file.c, file.h, fview.c, main2.c, palette.c,
+	  palette.h, synh.h, wline.c, wline.h, c_syntax/c_syntax2.h,
+	  c_syntax/funcs.c: {} tooltips, part I
+
+2004-06-03 22:41  lotzmana
+
+	* Makefile, src/c_syntax/funcs.c: fixed: if/else for case of no {}
+
+2004-06-03 22:27  lotzmana
+
+	* ChangeLog, src/c_syntax/funcs.c: fixed: strrev() not present in
+	  glibc
+
+2004-05-25 22:03  lotzmana
+
+	* NEWS, src/c_syntax/funcs.c: added: highlighting of if/else pair
+
+2004-05-23 22:03  lotzmana
+
+	* ChangeLog, NEWS, src/block.c, src/wline.c, src/c_syntax/funcs.c:
+	  fix: matching brackets crash
+
+2004-05-18 19:52  lotzmana
+
+	* ChangeLog, NEWS: NEWS updated
+
+2004-05-18 19:46  lotzmana
+
+	* NEWS, src/file2.c, src/c_syntax/funcs.c: highlighting do-while
+	  pair
+
+2004-05-16 20:04  lotzmana
+
+	* NEWS, src/c_syntax/funcs.c: highlighting of if/while/func_name
+
+2004-05-13 20:47  lotzmana
+
+	* ChangeLog, NEWS, src/main2.c, src/mru.c, src/mru.h,
+	  src/palette.c, src/c_syntax/funcs.c: eliminating unnecessary
+	  'noname' from MRU list
+
+2004-05-11 22:48  lotzmana
+
+	* src/main2.c: brackets highlighting
+
+2004-05-11 22:39  lotzmana
+
+	* ChangeLog, src/blockcmd.c, src/bookmcmd.c, src/doctype.c,
+	  src/doctype.h, src/edinterf.c, src/edinterf.h, src/file.c,
+	  src/file.h, src/fview.c, src/main2.c, src/searchf.c,
+	  src/smalledt.c, src/synh.h, src/wline.c, src/wline.h,
+	  src/c_syntax/c_syntax.c, src/c_syntax/c_syntax2.h,
+	  src/c_syntax/funcs.c, win_proj/ww.dsp: brackets highlighting
+
+2004-03-29 22:11  lotzmana
+
+	* ChangeLog, src/bookm.c, src/bookm.h, src/debug.c, src/l2disp.c,
+	  src/l_kbd.c, src/l_scr.c, src/main2.c, src/searchf.c: bookmark
+	  fixes
+
+2004-03-21 18:40  lotzmana
+
+	* src/main2.c: b18
+
+2004-03-21 18:39  lotzmana
+
+	* ChangeLog, Makefile, src/assertsc.c, src/block.c, src/blockcmd.c,
+	  src/blockcmd.h, src/bookm.c, src/bookm.h, src/bookmcmd.c,
+	  src/filecmd.c, src/filenav.c, src/findf.c, src/fview.c,
+	  src/history.c, src/hypertvw.c, src/infordr.c, src/keyset.c,
+	  src/keyset.h, src/l1opt.c, src/l1opt.h, src/l_scr.c, src/main2.c,
+	  src/nav.c, src/pageheap.c, src/search.c, src/searchf.c,
+	  src/smalledt.c, src/synh.h, src/c_syntax/synh.c,
+	  src/c_syntax/synh.l: F8 marks a block
+
+2004-03-06 17:23  lotzmana
+
+	* ChangeLog, src/block.c, src/bookm.c, src/bookmcmd.c,
+	  src/palette.c, src/palette.h, src/searchf.c, src/synh.h:
+	  UserBookmarks are color marked in the file
+
+2004-03-04 22:12  lotzmana
+
+	* ChangeLog, Makefile, src/bookm.c, src/global.h, src/l2disp.c,
+	  src/c_syntax/funcs.c, src/c_syntax/synh.c, src/c_syntax/synh.l:
+	  bug: alignment to 16 bytes added in bookmarks management
+
+2004-03-04 18:15  mikov
+
+	* src/palette.c: Changed NON_TEXT to _NON_TEXT so teh VC palette is
+	  on by default in Win32 GUI, as intended.
+
+2004-03-03 22:22  lotzmana
+
+	* ChangeLog, src/block.c, src/bookm.c, src/bookm.h, src/file.c,
+	  src/file.h, src/filenav.c, src/nav.c, src/palette.c,
+	  src/searchf.c, src/searchf.h, src/synh.h, src/wline.c,
+	  src/wline.h, src/c_syntax/funcs.c: C/C++ function names
+	  highlighting added
+
+2004-02-24 22:08  lotzmana
+
+	* src/: bookm.c, bookm.h, filecmd.c, filenav.c, palette.c,
+	  searchf.c, searchf.h, wline.c, wline.h, c_syntax/c_syntax2.h,
+	  c_syntax/funcs.c: first step of highlighting function names
+
+2004-02-17 22:33  lotzmana
+
+	* ChangeLog, src/block.c, src/bookm.c, src/file.c, src/file.h,
+	  src/filecmd.c, src/main2.c, src/wline.c, src/wline.h,
+	  src/c_syntax/funcs.c, src/c_syntax/synh.c:
+	  BMSetFindNextBookmark() falls in endless loop in Find In Files
+
+2004-02-12 22:36  lotzmana
+
+	* ChangeLog, src/blockcmd.c, src/blockcmd.h, src/bookmcmd.c,
+	  src/fview.c, src/fview.h, src/c_syntax/funcs.c: autoincremental
+	  search in Search|Functions bookmarks viewer
+
+2004-02-01 17:43  lotzmana
+
+	* ChangeLog, src/nav.c, src/nav.h, src/synh.h, src/wline.c,
+	  src/c_syntax/synh.c, src/c_syntax/synh.l: bug fix: /t messes the
+	  syntax highlighting output
+
+2004-01-31 23:59  lotzmana
+
+	* ChangeLog, src/bookm.c, src/bookm.h, src/bookmcmd.c, src/fview.c,
+	  src/fview.h, src/l2disp.c, src/l2disp.h, src/nav.c, src/nav.h,
+	  src/palette.c, src/searchf.c, src/searchf.h, src/searcmd.c,
+	  src/synh.h, src/wline.c, src/wline.h: search|functions viewer
+	  highlights the names
+
+2004-01-28 22:09  lotzmana
+
+	* src/: bookm.c, bookm.h, bookmcmd.c, infordr.c, ini2.c, searchf.c,
+	  c_syntax/synh.c, c_syntax/synh.l: Bookmarks FindFirst/Next has
+	  been completed
+
+2004-01-22 22:26  lotzmana
+
+	* ChangeLog, src/bookm.c, src/bookm.h, src/bookmcmd.c, src/main2.c,
+	  src/c_syntax/funcs.c: Search|Function scan fix and bookmarks fix
+
+2004-01-20 22:31  lotzmana
+
+	* src/file2.c, src/file2.h, src/filecmd.c, src/l1def.c,
+	  src/l1def.h, src/wrkspace.c, ChangeLog: buf fix: editor used to
+	  crash when last file is closed
+
+2004-01-14 22:17  lotzmana
+
+	* ChangeLog, Makefile, extra/ww, src/assertsc.c, src/block.c,
+	  src/block2.c, src/blockcmd.c, src/blockcmd.h, src/bookm.c,
+	  src/bookm.h, src/bookmcmd.c, src/bookmcmd.h, src/calccmd.c,
+	  src/calccmd.h, src/cmd.c, src/cmd.h, src/contain.c,
+	  src/contain.h, src/ctxhelp.c, src/diag.c, src/diag.h,
+	  src/doctype.c, src/doctype.h, src/editcmd.c, src/editcmd.h,
+	  src/enterln.c, src/file.c, src/file.h, src/file2.c, src/file2.h,
+	  src/filecmd.c, src/filecmd.h, src/filemenu.c, src/filenav.c,
+	  src/filenav.h, src/fnavcmd.c, src/fnavcmd.h, src/fview.c,
+	  src/fview.h, src/global.h, src/gui_kbd.c, src/gui_scr.c,
+	  src/heapg.c, src/helpcmd.c, src/helpcmd.h, src/hypertvw.c,
+	  src/infordr.c, src/ini2.c, src/kbd.h, src/keyset.c, src/keyset.h,
+	  src/ksetcmd.c, src/ksetcmd.h, src/l1def.c, src/l1def.h,
+	  src/l1opt.c, src/l1opt.h, src/l2disp.c, src/l2disp.h,
+	  src/l_kbd.c, src/l_scr.c, src/main2.c, src/menu.c, src/menu.h,
+	  src/menudat.c, src/nav.c, src/nav.h, src/navcmd.c, src/navcmd.h,
+	  src/options.c, src/options.h, src/pageheap.c, src/palette.c,
+	  src/palette.h, src/path.c, src/scr.c, src/scr.h, src/search.c,
+	  src/search.h, src/searchf.c, src/searchf.h, src/searcmd.c,
+	  src/searcmd.h, src/smalledt.c, src/smalledt.h, src/synh.h,
+	  src/umenu.c, src/undo.c, src/undocmd.c, src/undocmd.h,
+	  src/w_kbd.c, src/w_scr.c, src/winclip.c, src/wlimits.h,
+	  src/wline.c, src/wline.h, src/wrkspace.c, src/wrkspace.h,
+	  src/ww.c, src/x_kbd.c, src/x_scr.c, src/c_syntax/c_syntax.c,
+	  src/c_syntax/c_syntax.h, src/c_syntax/c_syntax2.h,
+	  src/c_syntax/funcs.c, src/c_syntax/makefile, src/c_syntax/synh.c,
+	  src/c_syntax/synh.l, src/fpcalc/calc_tab.c,
+	  src/fpcalc/calcfunc.c, src/fpcalc/fpconf.h, win_proj/ww.dsp:
+	  updates of the last 20 months
+
+2004-01-14 21:48  lotzmana
+
+	* src/: pallete.c, pallete.h: removing pallete.c pallete.h
+
+2002-03-27 00:08  lotzmana
+
+	* ChangeLog: build_15 changes log
+
+2002-03-26 23:58  lotzmana
+
+	* NEWS: build_15 NEWS
+
+2002-03-26 23:51  lotzmana
+
+	* src/main2.c: Indicated the new build number.
+
+2002-03-26 23:50  lotzmana
+
+	* src/: search.c, search.h, searchf.c, searcmd.c: Added the
+	  "replace" portion of the search/replace command.
+
+2002-03-26 23:47  lotzmana
+
+	* src/: menudat.c, navcmd.c, options.c: Accomodates changes in
+	  EnterLn() prototype.
+
+2002-03-26 23:46  lotzmana
+
+	* src/: l1def.c, l1def.h: New search/replace error messages.
+
+2002-03-26 23:44  lotzmana
+
+	* src/filemenu.c: Accomodates changes in EnterLn().
+
+2002-03-26 23:43  lotzmana
+
+	* src/filecmd.c: Improved replace pattern diagnostic output
+
+2002-03-26 23:42  lotzmana
+
+	* src/: enterln.c, enterln.h: Added support for context help in
+	  EnterLn().
+
+2002-03-26 23:40  lotzmana
+
+	* src/calccmd.c: Accomodates changes in EnterLn()
+
+2002-03-26 23:32  lotzmana
+
+	* src/: block.c, block.h: DeleteCharacterBlock() returns a
+	  success/failure code
+
+2002-03-26 23:30  lotzmana
+
+	* doc/ww.txi: Added help pages
+
+2002-02-22 21:49  lotzmana
+
+	* src/undo.c, src/undo.h, src/undocmd.c, src/undocmd.h,
+	  src/w_kbd.c, src/w_scr.c, src/winclip.c, src/winclip.h,
+	  src/wlimits.h, src/wline.c, src/wline.h, src/wrkspace.c,
+	  src/wrkspace.h, src/ww.c, src/perl_re/get.c,
+	  src/perl_re/internal.h, src/perl_re/config.h, src/perl_re/pcre.c,
+	  src/perl_re/maketables.c, src/perl_re/chartables.c,
+	  src/fpcalc/calc.h, src/perl_re/pcre.h, src/perl_re/study.c,
+	  src/fpcalc/calcfunc.c, src/fpcalc/calcops.inc,
+	  src/fpcalc/calcops.phs, src/fpcalc/calcpriv.h,
+	  src/fpcalc/calc_tab.c, src/fpcalc/calc_tab.h,
+	  src/fpcalc/fpconf.h, src/fpcalc/lexfcalc.c, src/fpcalc/makefile,
+	  src/fpcalc/notes.txt, src/fpcalc/scan.l, src/fpcalc/calc.y,
+	  src/fpcalc/w.ini, doc/ww.txi, extra/wkeys.map, win_proj/ww.dsp:
+	  Initial import
+
+2002-02-22 21:49  lotzmana
+
+	* src/undo.c, src/undo.h, src/undocmd.c, src/undocmd.h,
+	  src/w_kbd.c, src/w_scr.c, src/winclip.c, src/winclip.h,
+	  src/wlimits.h, src/wline.c, src/wline.h, src/wrkspace.c,
+	  src/wrkspace.h, src/ww.c, src/perl_re/get.c,
+	  src/perl_re/internal.h, src/perl_re/config.h, src/perl_re/pcre.c,
+	  src/perl_re/maketables.c, src/perl_re/chartables.c,
+	  src/fpcalc/calc.h, src/perl_re/pcre.h, src/perl_re/study.c,
+	  src/fpcalc/calcfunc.c, src/fpcalc/calcops.inc,
+	  src/fpcalc/calcops.phs, src/fpcalc/calcpriv.h,
+	  src/fpcalc/calc_tab.c, src/fpcalc/calc_tab.h,
+	  src/fpcalc/fpconf.h, src/fpcalc/lexfcalc.c, src/fpcalc/makefile,
+	  src/fpcalc/notes.txt, src/fpcalc/scan.l, src/fpcalc/calc.y,
+	  src/fpcalc/w.ini, doc/ww.txi, extra/wkeys.map, win_proj/ww.dsp:
+	  Initial revision
+
+2002-02-22 21:46  lotzmana
+
+	* src/: hypertvw.c, hypertvw.h, infordr.c, infordr.h, ini.c, ini.h,
+	  ini2.c, ini2.h, kbd.c, kbd.h, keydefs.h, keynames.c, keyset.c,
+	  keyset.h, ksetcmd.c, ksetcmd.h, l1def.c, l1def.h, l1opt.c,
+	  l1opt.h, l2disp.c, l2disp.h, main2.c, main2.h, maxpath.h,
+	  memory.c, memory.h, menu.c, menu.h, menudat.c, menudat.h, mru.c,
+	  mru.h, nav.c, nav.h, navcmd.c, navcmd.h, options.c, options.h,
+	  pallete.c, pallete.h, path.c, path.h, scr.c, scr.h, l_kbd.c,
+	  l_scr.c, search.c, search.h, searchf.c, searchf.h, searcmd.c,
+	  searcmd.h, smalledt.c, smalledt.h, tarray.h, tblocks.c,
+	  tblocks.h, umenu.c, umenu.h: Initial import
+
+2002-02-22 21:46  lotzmana
+
+	* src/: hypertvw.c, hypertvw.h, infordr.c, infordr.h, ini.c, ini.h,
+	  ini2.c, ini2.h, kbd.c, kbd.h, keydefs.h, keynames.c, keyset.c,
+	  keyset.h, ksetcmd.c, ksetcmd.h, l1def.c, l1def.h, l1opt.c,
+	  l1opt.h, l2disp.c, l2disp.h, main2.c, main2.h, maxpath.h,
+	  memory.c, memory.h, menu.c, menu.h, menudat.c, menudat.h, mru.c,
+	  mru.h, nav.c, nav.h, navcmd.c, navcmd.h, options.c, options.h,
+	  pallete.c, pallete.h, path.c, path.h, scr.c, scr.h, l_kbd.c,
+	  l_scr.c, search.c, search.h, searchf.c, searchf.h, searcmd.c,
+	  searcmd.h, smalledt.c, smalledt.h, tarray.h, tblocks.c,
+	  tblocks.h, umenu.c, umenu.h: Initial revision
+
+2002-02-22 21:43  lotzmana
+
+	* COPYING, ChangeLog, Makefile, NEWS, README, TODO, src/clips.c,
+	  src/debug.c, src/dirent.c, src/pageheap.c, src/precomp.c,
+	  src/wd.c, src/wl.c, src/findf.c, src/strlwr.c, src/heapg.c,
+	  src/clist.h, src/dirent.h, src/findf.h, src/pageheap.h,
+	  src/global.h, src/heapg.h, src/assertsc.c, src/block.c,
+	  src/block.h, src/block2.c, src/blockcmd.c, src/blockcmd.h,
+	  src/bookm.c, src/bookm.h, src/bookmcmd.c, src/bookmcmd.h,
+	  src/calccmd.c, src/calccmd.h, src/cmd.c, src/cmd.h,
+	  src/ctxhelp.c, src/ctxhelp.h, src/defs.c, src/defs.h, src/diag.c,
+	  src/diag.h, src/doctype.c, src/doctype.h, src/edit.c, src/edit.h,
+	  src/editcmd.c, src/editcmd.h, src/enterln.c, src/enterln.h,
+	  src/file.c, src/file.h, src/file2.c, src/file2.h, src/filecmd.c,
+	  src/filecmd.h, src/filemenu.c, src/filemenu.h, src/filenav.c,
+	  src/filenav.h, src/fnavcmd.c, src/fnavcmd.h, src/helpcmd.c,
+	  src/helpcmd.h, src/history.c, src/history.h: Initial import
+
+2002-02-22 21:43  lotzmana
+
+	* COPYING, ChangeLog, Makefile, NEWS, README, TODO, src/clips.c,
+	  src/debug.c, src/dirent.c, src/pageheap.c, src/precomp.c,
+	  src/wd.c, src/wl.c, src/findf.c, src/strlwr.c, src/heapg.c,
+	  src/clist.h, src/dirent.h, src/findf.h, src/pageheap.h,
+	  src/global.h, src/heapg.h, src/assertsc.c, src/block.c,
+	  src/block.h, src/block2.c, src/blockcmd.c, src/blockcmd.h,
+	  src/bookm.c, src/bookm.h, src/bookmcmd.c, src/bookmcmd.h,
+	  src/calccmd.c, src/calccmd.h, src/cmd.c, src/cmd.h,
+	  src/ctxhelp.c, src/ctxhelp.h, src/defs.c, src/defs.h, src/diag.c,
+	  src/diag.h, src/doctype.c, src/doctype.h, src/edit.c, src/edit.h,
+	  src/editcmd.c, src/editcmd.h, src/enterln.c, src/enterln.h,
+	  src/file.c, src/file.h, src/file2.c, src/file2.h, src/filecmd.c,
+	  src/filecmd.h, src/filemenu.c, src/filemenu.h, src/filenav.c,
+	  src/filenav.h, src/fnavcmd.c, src/fnavcmd.h, src/helpcmd.c,
+	  src/helpcmd.h, src/history.c, src/history.h: Initial revision
+
