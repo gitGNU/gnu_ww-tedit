@@ -116,3 +116,7 @@ ADD_EXECUTABLE(ww WIN32 ${ww_src})
 
 TARGET_LINK_LIBRARIES(ww ${dbghelp_lib})
 
+SET_TARGET_PROPERTIES(ww PROPERTIES
+                      LINK_FLAGS_DEBUG "/incremental:no"
+                      LINK_FLAGS_RELEASE "/incremental:no")
+
