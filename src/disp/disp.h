@@ -76,8 +76,8 @@ void disp_error_clear(dispc_t *disp);
 
 /* To be used in ASSERT()! */
 #ifdef _DEBUG
-int _disp_cbuf_is_valid(const disp_char_buf_t *cbuf);
-#define VALID_DISP_CHAR_BUF(cbuf) (_disp_cbuf_is_valid(cbuf))
+int s_disp_cbuf_is_valid(const disp_char_buf_t *cbuf);
+#define VALID_DISP_CHAR_BUF(cbuf) (s_disp_cbuf_is_valid(cbuf))
 #else
 #define VALID_DISP_CHAR_BUF(cbuf) (1)
 #endif
@@ -309,7 +309,6 @@ void disp_elapsed_time_set(dispc_t *disp, const disp_elapsed_time_t *t);
 @}
 */
 
-
 /*!
 @page disp_page1 TODO: documenting disp module
 
@@ -317,6 +316,12 @@ disp library
 
 --manages a window for input and output\n
 --main event loop\n
+
+Files:
+disp_common.c are the top level API functions, it is included in the
+platform specific implementations.
+
+win_g_disp.c are the WIN32 GUI emulation functions. It includes disp_common.c
 
 */
 

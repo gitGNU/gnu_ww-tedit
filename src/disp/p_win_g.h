@@ -34,6 +34,9 @@ prototype of assert.
 #ifndef P_WIN_G_H
 #define P_WIN_G_H
 
+#pragma warning(disable:4200)
+/* C4200: nonstandard extension used : zero-sized array in struct/union */
+
 #define DISP_EVENT_QUEUE_SIZE 32
 
 struct disp_char
