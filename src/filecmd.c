@@ -237,7 +237,7 @@ typedef struct _CheckSaveContext
 {
   BOOLEAN bCanceled;
   BOOLEAN bCheck;
-  dispc_t *disp;
+  wrkspace_data_t *wrkspace;
 } TCheckSaveContext;
 
 /* ************************************************************************
@@ -251,11 +251,12 @@ static BOOLEAN CheckSave(TFile *pFile, void *_pContext)
   TCheckSaveContext *pContext;
   int nFileNumber;
   dispc_t *disp;
+  cmdc_t cmdc;
 
   ASSERT(VALID_PFILE(pFile));
 
   pContext = _pContext;
-  disp = pContext->disp;
+  disp = wrkspace_get_disp(CMDC_WRKSPACE(pContext));
   if (pFile->bChanged)
   {
     if (!pContext->bCheck)
@@ -270,7 +271,8 @@ _saveafile:
         ASSERT(nFileNumber >= 0);
         SetTopFileByLoadNumber(pFilesInMemoryList, nFileNumber);
         /* TODO: cmdc_t! */
-        CmdFileSave(pFile);
+        CMDC_SET(cmdc, pContext->wrkspace, pFile);
+        CmdFileSave(&cmdc);
         break;
       case 1:  /* No */
         return TRUE;
@@ -295,6 +297,8 @@ void CmdFileSaveAll(void *pCtx)
 
   CheckSaveContext.bCanceled = FALSE;
   CheckSaveContext.bCheck = FALSE;
+  CheckSaveContext.wrkspace = CMDC_WRKSPACE(pCtx);
+
   nCurFile = GetTopFileNumber(pFilesInMemoryList);
   FileListForEach(pFilesInMemoryList, CheckSave, FALSE, &CheckSaveContext);
   SetTopFileByLoadNumber(pFilesInMemoryList, nCurFile);
@@ -407,7 +411,7 @@ void CmdFileExit(void *pCtx)
   /* Check to save the changed files before exit */
   CheckSaveContext.bCanceled = FALSE;
   CheckSaveContext.bCheck = TRUE;
-  CheckSaveContext.disp = disp;
+  CheckSaveContext.wrkspace = CMDC_WRKSPACE(pCtx);
   FileListForEach(pFilesInMemoryList, CheckSave, FALSE, &CheckSaveContext);
   if (CheckSaveContext.bCanceled)
     return;
