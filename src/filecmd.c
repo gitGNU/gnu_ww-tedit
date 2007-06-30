@@ -187,7 +187,7 @@ void CmdFileSave(void *pCtx)
 
   FSplit(pFile->sFileName, sFilePath, sFileName, "*", TRUE, TRUE);
   if (pFile->bNew && filestrcmp(sFileName, sNoname) == 0)
-    CmdFileSaveAs(pFile);
+    CmdFileSaveAs(pCtx);
   else
     StoreFile(pFile, pMRUFilesList, disp);
 
