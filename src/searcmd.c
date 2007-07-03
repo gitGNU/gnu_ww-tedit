@@ -140,6 +140,9 @@ void CmdEditFindSelectedBack(void *pCtx)
 {
   TFile *pFile;
   disp_wnd_param_t wnd_param;
+  dispc_t *disp;
+
+  disp = wrkspace_get_disp(CMDC_WRKSPACE(pCtx));
 
   pFile = CMDC_PFILE(pCtx);
   if (!GetSelected(pFile))
@@ -148,7 +151,7 @@ void CmdEditFindSelectedBack(void *pCtx)
 
   if (pFile->bBlock)
     GotoPosRow(pFile, pFile->nStartPos, pFile->nRow);
-  disp_wnd_get_param(0, &wnd_param);  /* TODO: supply disp! */
+  disp_wnd_get_param(disp, &wnd_param);
   Find(pFile, -1, wnd_param.width, &stSearchContext);
   AddHistoryLine(pFindHistory, stSearchContext.sSearch);
 }
@@ -160,8 +163,11 @@ void CmdEditFindSelectedBack(void *pCtx)
 void CmdEditFindNext(void *pCtx)
 {
   disp_wnd_param_t wnd_param;
+  dispc_t *disp;
 
-  disp_wnd_get_param(0, &wnd_param);  /* TODO: supply disp! */
+  disp = wrkspace_get_disp(CMDC_WRKSPACE(pCtx));
+
+  disp_wnd_get_param(disp, &wnd_param);
   Find(CMDC_PFILE(pCtx), 1, wnd_param.width, &stSearchContext);
 }
 
@@ -172,8 +178,11 @@ void CmdEditFindNext(void *pCtx)
 void CmdEditFindBack(void *pCtx)
 {
   disp_wnd_param_t wnd_param;
+  dispc_t *disp;
 
-  disp_wnd_get_param(0, &wnd_param);  /* TODO: supply disp! */
+  disp = wrkspace_get_disp(CMDC_WRKSPACE(pCtx));
+
+  disp_wnd_get_param(disp, &wnd_param);
   Find(CMDC_PFILE(pCtx), -1, wnd_param.width, &stSearchContext);
 }
 

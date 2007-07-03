@@ -27,6 +27,8 @@ of a define -- D_ASSERT. It must conform to the standard C library
 prototype of assert.
 */
 
+#pragma warning(push, 4)
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 

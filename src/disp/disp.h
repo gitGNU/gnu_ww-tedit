@@ -156,9 +156,7 @@ void disp_cursor_restore_param(dispc_t *disp,
 
 void disp_wnd_set_title(dispc_t *disp, const char *title);
 
-/*
-Shift state mask constants
-*/
+/* Shift state mask constants */
 #define kbShift      1
 #define kbReserved   2
 #define kbCtrl       4
@@ -166,6 +164,7 @@ Shift state mask constants
 #define kbScroll     16
 #define kbNum        32
 #define kbCaps       64
+
 
 /*
 Convertion macros:
@@ -322,7 +321,6 @@ disp_common.c are the top level API functions, it is included in the
 platform specific implementations.
 
 win_g_disp.c are the WIN32 GUI emulation functions. It includes disp_common.c
-
 */
 
 #endif  /* ifndef DISP_H */

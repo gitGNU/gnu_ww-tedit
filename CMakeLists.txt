@@ -1,5 +1,6 @@
 PROJECT(ww)
 
+# WIN32: use dbghelp library if installed in src/dbghelp
 IF (EXISTS src/dbghelp/dbghelp.h)
   SET(dbghelp_include src/dbghelp)
   SET(dbghelp_lib     ${CMAKE_CURRENT_SOURCE_DIR}/src/dbghelp/dbghelp.lib)
@@ -14,7 +15,7 @@ SET(disp_lib_src src/disp/win_g_disp.c)
 SET(disp_lib_include src/disp)
 SET_SOURCE_FILES_PROPERTIES(${disp_lib_src}
                             PROPERTIES
-                            COMPILE_FLAGS "-D D_ASSERT=_assert_sc -W4")
+                            COMPILE_FLAGS "-D D_ASSERT=_assert_sc")
 
 SET(perl_re_lib_src src/perl_re/get.c
                     src/perl_re/maketables.c
