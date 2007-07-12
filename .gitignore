@@ -1,5 +1,4 @@
-dbg_con
-rel_con
-dbg_g
-rel_g
+build
+.sconsign.dblite
+
 
