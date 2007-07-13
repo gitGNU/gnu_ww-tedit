@@ -154,13 +154,8 @@ extern void _assert_sc( const char *cond, const char *name, unsigned int line );
 extern char szDebugLogName[];
 extern BOOL bDebugTraceEnabled;
 #else
-#  ifdef WIN32
-#  define ASSERT( x )
 #  define ASSUME( x )  __assume(x)
-#  else
 #  define ASSERT( x )
-#  define ASSUME( x )
-#  endif
 #  define VERIFY( x )       (x)
 #  define TRACE0( x )
 #  define TRACE1( x, a1 )
@@ -171,12 +166,21 @@ extern BOOL bDebugTraceEnabled;
 ///////////////////////////////////////////////////////////////////////////////
 // definitions that could optimize the code but are specific for the compiler
 
+#if !(_MSC_VER >= 1000)
+#  define __assume(x)
+#endif
+
 // INLINE :specifies an explicit inline function
 #if (_MSC_VER >= 1000) || (__GNUC__ > 1)
 #  define INLINE  __inline
 #  define SUPPORT_INLINE  1
 #else
 #  define INLINE
+#endif
+
+#ifndef HAVE_WIN32EH
+#  define __try        
+#  define __except(x)  if (0)
 #endif
 
 #define INTEL_BYTE_ORDER  1
