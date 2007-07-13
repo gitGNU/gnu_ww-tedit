@@ -98,7 +98,9 @@ void DoneFileList(TFileList *pFileList)
     #endif
     s_free(pFileItem);
   }
+  #ifdef _DEBUG
   pFileList->MagicByte = 0;
+  #endif
 }
 
 /* ************************************************************************
