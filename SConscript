@@ -1,35 +1,36 @@
 true = 1
 false = 0
 
+# This is the build environment
+env = Environment()
+
+# Prepare default option values
+if env['PLATFORM'] == 'win32':
+  env['WIN32'] = true
+else:
+  env['WIN32'] = false
+
 # Command line arguments
 opts = Options('options.cache')
 opts.AddOptions(
   BoolOption('_DEBUG', 'debug build', true),
   BoolOption('_NON_TEXT', 'uses GUI to emulate console functions', false),
-  BoolOption('WIN32', 'Win32 target', false),
-  PathOption('PREFIX', 'Installation directory (prepend with # if local)', '/usr/local', PathOption.PathIsDirCreate)
+  BoolOption('WIN32', 'Win32 target', env['WIN32']),
+  ('DESTDIR', 'Optional staging directory (prepend with # if local)', ''),
+  ('PREFIX', 'Installation directory', '/usr/local'),
 )
 
-# Build environment
-env = Environment( options = opts )
+opts.Update(env)
 Help(opts.GenerateHelpText(env))
-
-# Extract theoptions into variables for convenience
-_DEBUG = env['_DEBUG']
-_NON_TEXT = env['_NON_TEXT']
-WIN32 = env['WIN32']
-cross = false
 
 #
 # Configuration
 #
 
 if env['PLATFORM'] == 'win32':
-  cross = false
-  WIN32 = true
+  env['WIN32'] = true
 else: # Posix platform
-  if WIN32: # Win32 cross-compilation ? Use the ming32 cross-compilation tool
-    cross = True
+  if env['WIN32']: # Win32 cross-compilation ? Use the ming32 cross-compilation tool
     env.Tool('crossmingw', ['../scons-tools'] )
 
 # Check if the compiler supports Win32-style EH. If so, updates the compiler
@@ -56,16 +57,16 @@ def CheckEH ( context ):
 # Configuration, but only if we are not cleaning
 if not env.GetOption('clean'): 
   # Different config for the GUI or text console build
-  if WIN32:
+  if env['WIN32']:
     env.Append( CCFLAGS='-DWIN32 -DUSE_WINDOWS')
     env.Append( LIBS=['gdi32'] )
-    if _NON_TEXT:
+    if env['_NON_TEXT']:
 	env.Append( CCFLAGS='-D_NON_TEXT -mwindows' )
 	env.Append( LIBS=['user32'] )
     else:
 	env.Append( CCFLAGS='-DDARK_BPAL -D_CONSOLE' )
   else: # Posix
-    if _NON_TEXT:
+    if env['_NON_TEXT']:
 	env.Append( CCFLAGS='-D_NON_TEXT' )
 	env.Append( CPPPATH=['/usr/X11R6/include', '/usr/include/freetype2'] )
 	# use freetype-config --libs and xft-config --libs to get lib names
@@ -88,11 +89,12 @@ env.Append( CCFLAGS='-Wall' )
 env.Append( CPPPATH=['src/perl_re','src/fpcalc','src/c_syntax','src/py_syntax'] )
 env.Append( LIBS=['m'] )
 
-if _DEBUG:
+if env['_DEBUG']:
   env.Append( CCFLAGS='-D_DEBUG -g -DHEAP_DBG=2' )
 else:
   env.Append( CCFLAGS='-DNDEBUG -O1' )
 
+# Cache the updated options
 opts.Save('options.cache', env)
 
 #
@@ -100,12 +102,12 @@ opts.Save('options.cache', env)
 #
 modules = []
 
-if WIN32:
+if env['WIN32']:
   modules += env.Object( Split("""
   	src/ww.c 
 	src/winclip.c
   """))
-  if _NON_TEXT:
+  if env['_NON_TEXT']:
       modules += env.Object( Split("""
 	      src/gui_kbd.c
 	      src/gui_scr.c
@@ -119,7 +121,7 @@ else: # Posix
   modules += env.Object( Split("""
   	src/wl.c
   """) )
-  if _NON_TEXT:
+  if env['_NON_TEXT']:
       modules += env.Object( Split("""
 	      src/x_kbd.c
 	      src/x_scr.c
@@ -227,14 +229,18 @@ modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=Split("""
 """))
 
 prog = env.Program( 'ww', modules )
+Default(prog)
 
-# Here are our installation paths:
-idir_prefix = '$PREFIX'
-idir_lib    = '$PREFIX/lib'
-idir_bin    = '$PREFIX/bin'
-idir_inc    = '$PREFIX/include'
-idir_data   = '$PREFIX/share'
+#
+# Prepare are our installation paths:
+# We need to use absolute paths because the path may start with "#" (for )
+#
+env['BINDIR']=env.Dir('$DESTDIR$PREFIX/bin').abspath
+env['SYSCONFDIR']=env.Dir('$DESTDIR/etc').abspath
 
-env.Install( idir_bin, prog )
-env.Alias( 'install', idir_prefix )
-
+inst = env.Command( 'install', prog,  [
+  'mkdir -p $BINDIR',
+  'install -t $BINDIR $SOURCE',
+])
+env.AlwaysBuild(inst)
+env.Alias( 'install', inst )
