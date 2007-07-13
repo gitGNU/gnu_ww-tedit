@@ -1,4 +1,8 @@
 build
 .sconsign.dblite
+.sconf_temp
+config.log
+scons-tools/*.pyc
+
 
 
