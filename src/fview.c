@@ -21,8 +21,10 @@ Descrition:
 #include "blockcmd.h"
 #include "fview.h"
 
+#if 0
 #if defined(UNIX) && defined(_NON_TEXT)
 #include "xclip.h"
+#endif
 #endif
 
 #if 0
@@ -168,9 +170,11 @@ static int HandleFileViewEvents(disp_event_t *ev, TView *pView)
   int ExitCode;
   BOOLEAN bDockedView;
   TExtraColorInterf *pExtraColorInterf;
+  #if 0
   #if defined(UNIX) && defined(_NON_TEXT)
   char clipbrd_buf[16 * 1024];
   char *clipbrd_str;
+  #endif
   #endif
   wrkspace_data_t *wrkspace;
   dispc_t *disp;
@@ -369,8 +373,10 @@ _execute_command2:
         PasteAndIndent(GetCurrentFile(), pClipboard);
         bBlockMarkMode = FALSE;
         /* TODO: implement this function accross platforms and remove #ifdefs */
+        #if 0
         #if defined(UNIX) && defined(_NON_TEXT)
         xclipbrd_free(pEvent->e.pdata);
+        #endif
         #endif
         break;
 
@@ -379,6 +385,7 @@ _execute_command2:
         break;
 
       case EVENT_CLIPBOARD_COPY_REQUESTED:
+        #if 0
         #if defined(UNIX) && defined(_NON_TEXT)
         clipbrd_str = tblock_copy_to_str(pClipboard, DEFAULT_EOL_TYPE,
           clipbrd_buf, sizeof(clipbrd_buf));
@@ -390,6 +397,7 @@ _execute_command2:
           clipbrd_str, pEvent->e.p.param2);
         if (clipbrd_str != clipbrd_buf)  /* allocated in the heap? */
           s_free(clipbrd_str);
+        #endif
         #endif
         break;
     }

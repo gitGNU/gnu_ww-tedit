@@ -65,7 +65,8 @@ static void DiagKeyNames(dispc_t *disp)
   DWORD Key;
   char sKeyName[35];
   #ifdef UNIX
-  extern BOOLEAN bTraceKbd;
+  /* something similar will be needed with the new disp lib */
+  /* extern BOOLEAN bTraceKbd; */
   #endif
   disp_event_t stEvent;
   BOOLEAN bQuit;
@@ -76,7 +77,7 @@ static void DiagKeyNames(dispc_t *disp)
 
   PrintString(disp, "Press <ESC> to cancel\n");
   #ifdef UNIX
-  bTraceKbd = TRUE;
+  /*bTraceKbd = TRUE;*/
   #endif
   bQuit = FALSE;
   while (!bQuit)
@@ -115,7 +116,7 @@ static void DiagKeyNames(dispc_t *disp)
     }
   }
   #ifdef UNIX
-  bTraceKbd = FALSE;
+  /* bTraceKbd = FALSE; */
   #endif
 }
 

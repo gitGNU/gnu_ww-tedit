@@ -765,7 +765,7 @@ static const char *GetOnOff(BOOLEAN bOn)
   return (bOn ? sOn : sOff);
 }
 
-#ifdef _NON_TEXT
+#if defined(DISP_WIN32_GUIEMU)
 /* ************************************************************************
    Function: GetYesNo
    Description:
@@ -1634,7 +1634,7 @@ _failprintf:
 }
 
 /* StoreScreenGeometry() is only for graphical envyronments */
-#ifdef _NON_TEXT
+#if defined(DISP_WIN32_GUIEMU)
 /* ************************************************************************
    Function: StoreScreenGeometry
    Description:
@@ -1711,7 +1711,7 @@ _failprintf:
 
   return 0;
 }
-#endif /* NON_TEXT */
+#endif
 
 /* ************************************************************************
    Function: LoadScreenGeometry
@@ -1738,12 +1738,10 @@ void LoadScreenGeometry(TFile *pINIFile, disp_wnd_param_t *wnd)
   wnd->set_defaults = 1;  /* assume no data from outside */
 
   sSectionName = NULL;
-  #ifdef _NON_TEXT
-  #ifdef WIN32
+  #ifdef DISP_WIN32_GUIEMU
   sSectionName = sSection_SGeomWin;
   #else
-  sSectionName = sSection_SGeomX;
-  #endif
+  /*sSectionName = sSection_SGeomX;*/
   #endif
 
   if (sSectionName == NULL)
@@ -1891,14 +1889,12 @@ void StoreMasterOptions(BOOLEAN bForce, dispc_t *disp)
   if (StoreDocTypes(pINIFile, &Sec, bForce) != 0)
     goto _exit2;  /* TODO: show no-memory at exit-code 2 */
 
-  #ifdef _NON_TEXT
-  #ifdef WIN32
+  #ifdef DISP_WIN32_GUIEMU
   if (StoreScreenGeometry(pINIFile, sSection_SGeomWin, &Sec, disp) != 0)
     goto _exit2;  /* TODO: show no-memory at exit-code 2 */
   #else
-  if (StoreScreenGeometry(pINIFile, sSection_SGeomX, &Sec) != 0)
-    goto _exit2;  /* TODO: show no-memory at exit-code 2 */
-  #endif
+  //if (StoreScreenGeometry(pINIFile, sSection_SGeomX, &Sec) != 0)
+  //  goto _exit2;  /* TODO: show no-memory at exit-code 2 */
   #endif
 
 _exit2:

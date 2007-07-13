@@ -571,25 +571,6 @@ static disp_char_t* s_disp_buf_access(dispc_t *disp, int x, int y)
   return &disp->char_buf[y * disp->buf_width + x];
 }
 
-/*!
-@brief forms a RECT based on rectangle geometry
-
-@param disp a dispc object
-@param r  the output RECT
-@param x  upper left corner coordinates of the destination rectangle
-@param y  upper left corner coordinates of the destination rectangle
-@param w  rectangle geometry
-@param h  rectangle geometry
-*/
-static void s_disp_calc_area(const dispc_t *disp,
-                            RECT *r, int x, int y, int w, int h)
-{
-  r->left = x * disp->char_size.cx;
-  r->right = r->left + w * disp->char_size.cx;
-  r->top = y * disp->char_size.cy;
-  r->bottom = r->top + h * disp->char_size.cy;
-}
-
 #ifdef _DEBUG
 static void disp_is_inside_disp_buf(dispc_t *disp, disp_char_t *dest, int width)
 {

@@ -876,7 +876,7 @@ _check_for_link:
         if (!FSplit(sTargetName, sTargetPath, sTargetFileName, "ERROR", FALSE, TRUE))
         {
           /* FSplit() failed: display error */
-          ConsoleMessageProc(NULL, MSG_ERRNO | MSG_ERROR | MSG_OK, sTargetName, NULL);
+          ConsoleMessageProc(NULL, NULL, MSG_ERRNO | MSG_ERROR | MSG_OK, sTargetName, NULL);
         }
         strcpy(sTargetName, sTargetPath);
         strcat(sTargetName, sTargetNameTmp);

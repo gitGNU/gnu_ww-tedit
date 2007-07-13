@@ -17,6 +17,9 @@ Descrition:
 #  endif
 #endif
 
+/* entire file ifdef-ed */
+#ifdef DISP_WIN32_GUIEMU
+
 #include "global.h"
 #include "block.h"
 #include "wlimits.h"
@@ -500,6 +503,7 @@ void UninstallWinClipboardMonitor(void)
   CloseHandle(hThread);
   DeleteCriticalSection(&Section_ClipHist);
 }
+#endif /* DISP_WIN32_GUIEMU */
 
 /*
 This software is distributed under the conditions of the BSD style license.

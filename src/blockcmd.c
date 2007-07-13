@@ -286,10 +286,12 @@ void CmdEditDeleteBlock(void *pCtx)
   bBlockMarkMode = FALSE;
 }
 
+#if 0
 #if defined(_NON_TEXT) && defined(UNIX)
 /* TODO: produce unified interface for clipboards */
 #include "xclip.h"
 #define XCLIP
+#endif
 #endif
 
 /* ************************************************************************

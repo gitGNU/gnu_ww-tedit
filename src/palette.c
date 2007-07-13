@@ -140,7 +140,7 @@ BYTE VCPalette[MAX_PALETTE] =
   0x02, 0x0a   /* coTerm1, coTerm2 */
 };
 
-#ifdef _NON_TEXT
+#ifdef DISP_WIN32_GUIEMU
 //BYTE *CPalette = BorlandPalette;        /* Current palette */
 BYTE *CPalette = VCPalette;        /* Current palette */
 #else

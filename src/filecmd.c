@@ -1462,8 +1462,11 @@ void CmdHelpAbout(void *pCtx)
 #ifdef UNIX
   PrintString(disp, "UNIX\n");
 #endif
-#ifdef _NON_TEXT
-  PrintString(disp, "_NON_TEXT\n");
+#ifdef DISP_NCURSES
+  PrintString(disp, "DISP_NCURSES\n");
+#endif
+#ifdef DISP_WIN32_GUIEMU
+  PrintString(disp, "DISP_WIN32_GUIEMU\n");
 #endif
 
   PrintString(disp, "\n");

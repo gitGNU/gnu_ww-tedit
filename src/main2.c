@@ -875,7 +875,7 @@ static void disp_safe_free(void *buf)
   s_free(buf);
 }
 
-#if defined(WIN32) && defined(_NON_TEXT)
+#ifdef DISP_WIN32_GUIEMU
 extern HINSTANCE g_hInst;
 extern int       g_nCmdShow;
 #endif
@@ -909,8 +909,10 @@ void main2(int argc, char **argv)
     return;
   LoadScreenGeometry(pMasterINIFile, &wnd_param);
   disp = alloca(disp_obj_size());
+  #ifdef DISP_WIN32_GUIEMU
   wnd_param.instance = (int)g_hInst;
   wnd_param.show_state = g_nCmdShow;
+  #endif
   if (!disp_init(&wnd_param, disp))
     return;  /* fatal init problem */
   disp_set_safemem_proc(disp, disp_safe_malloc, disp_safe_free);

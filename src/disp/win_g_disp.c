@@ -89,6 +89,25 @@ static void s_disp_invalidate_rect(const dispc_t *disp, const RECT *r)
 }
 
 /*!
+@brief forms a RECT based on rectangle geometry
+
+@param disp a dispc object
+@param r  the output RECT
+@param x  upper left corner coordinates of the destination rectangle
+@param y  upper left corner coordinates of the destination rectangle
+@param w  rectangle geometry
+@param h  rectangle geometry
+*/
+static void s_disp_calc_area(const dispc_t *disp,
+                            RECT *r, int x, int y, int w, int h)
+{
+  r->left = x * disp->char_size.cx;
+  r->right = r->left + w * disp->char_size.cx;
+  r->top = y * disp->char_size.cy;
+  r->bottom = r->top + h * disp->char_size.cy;
+}
+
+/*!
 @brief Marks that area of the window has been changed. (win32 GUI)
 
 Call to this function will eventually make the text of the area

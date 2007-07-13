@@ -20,13 +20,13 @@ Descrition:
 #include "global.h"
 #include "main2.h"
 
+#ifdef DISP_WIN32_GUIEMU
 void OutOfMemory(void)
 {
   puts("\n\nOut of memory!!!\n");
   abort();
 }
 
-#if defined(WIN32) && defined(_NON_TEXT)
 HINSTANCE g_hInst = NULL;
 int       g_nCmdShow = SW_NORMAL;
 
@@ -49,7 +49,25 @@ int WINAPI WinMain(
   return 0;
 }
 
-#else
+#endif
+
+#ifdef DISP_NCURSES
+
+void OutOfMemory(void)
+{
+  puts("\n\nOut of memory!!!\n");
+  abort();
+}
+
+int main(int argc, char **argv)
+{
+  main2(argc, argv);
+  return (0);
+}
+
+#endif
+
+#if 0
 
 int main(int argc, char **argv)
 {
