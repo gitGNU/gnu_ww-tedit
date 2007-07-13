@@ -4,11 +4,16 @@ false = 0
 # This is the build environment
 env = Environment()
 
+print 'Platform: %s' % env['PLATFORM']
+
+#Uncomment this to see what the environment contains
+#print env.Dump();Exit(0)
+
 # Prepare default option values
 if env['PLATFORM'] == 'win32':
-  env['WIN32'] = true
+    env['WIN32'] = true
 else:
-  env['WIN32'] = false
+    env['WIN32'] = false
 
 # Command line arguments
 opts = Options('options.cache')
@@ -27,72 +32,107 @@ Help(opts.GenerateHelpText(env))
 # Configuration
 #
 
+# Force Win32 target under Win32
 if env['PLATFORM'] == 'win32':
-  env['WIN32'] = true
+    env['WIN32'] = true
+elif env['PLATFORM'] == 'cygwin':
+    if env['WIN32']: # Win32 cross-compilation under cygwin ?
+        env.Append( CCFLAGS='-mno-cygwin' )
+        env.Append( LINKFLAGS='-mno-cygwin' )
 else: # Posix platform
-  if env['WIN32']: # Win32 cross-compilation ? Use the ming32 cross-compilation tool
-    env.Tool('crossmingw', ['../scons-tools'] )
+    if env['WIN32']: # Win32 cross-compilation ? Use the ming32 cross-compilation tool
+        env.Tool('crossmingw', ['../scons-tools'] )
+
+# Remember if we are running under msvc
+msvc = "cl" == env['CC']
+
 
 # Check if the compiler supports Win32-style EH. If so, updates the compiler
 # defines with -DHAVE_WIN32EH
 def CheckEH ( context ):
-  context.Message('Checking for Win32-style EH... ')
-  result = context.TryCompile( extension=".c", text="""
-    void ehfunc ( void )
-    {
-      __try { (void)0; } __except { (void)0; }
-    }
-  """)
-  context.Result(result)
-  key = "HAVE_WIN32EH"
-  if result:
-    context.env.Append( CCFLAGS='-D'+key )
-  if hasattr(context,'config_h'):
+    context.Message('Checking for Win32-style EH... ')
+    result = context.TryCompile( extension=".c", text="""
+        void ehfunc ( void )
+        {
+          __try { (void)0; } __except(0) { (void)0; }
+        }
+    """)
+    context.Result(result)
+    key = "HAVE_WIN32EH"
     if result:
-      context.config_h += '#define %s\n' % key 
-    else:
-      context.config_h += '/* #undef %s */\n' % key
-  return result
+        context.env.Append( CCFLAGS='-D'+key )
+    if hasattr(context,'config_h'):
+        if result:
+            context.config_h += '#define %s\n' % key
+        else:
+            context.config_h += '/* #undef %s */\n' % key
+    return result
 
-# Configuration, but only if we are not cleaning
-if not env.GetOption('clean'): 
-  # Different config for the GUI or text console build
-  if env['WIN32']:
-    env.Append( CCFLAGS='-DWIN32 -DUSE_WINDOWS')
-    env.Append( LIBS=['gdi32'] )
-    if env['_NON_TEXT']:
-	env.Append( CCFLAGS='-D_NON_TEXT -mwindows' )
-	env.Append( LIBS=['user32'] )
-    else:
-	env.Append( CCFLAGS='-DDARK_BPAL -D_CONSOLE' )
-  else: # Posix
-    if env['_NON_TEXT']:
-	env.Append( CCFLAGS='-D_NON_TEXT' )
-	env.Append( CPPPATH=['/usr/X11R6/include', '/usr/include/freetype2'] )
-	# use freetype-config --libs and xft-config --libs to get lib names
-	env.Append( LIBS=['Xft','Xrender','X11'] )
-	env.Append( LIBS=['fontconfig','pthread','expat','freetype','z'] )
-    else:
-	env.Append( CCFLAGS='-DDARK_BPAL' )
-	env.Append( LIBS=['curses'] )
+# Libraries
+if not msvc:
+    env.Append( LIBS=['m'] )
 
-  conf = Configure(env, custom_tests={'CheckEH':CheckEH} )
-  if conf.CheckLibWithHeader( 'dbghelp', 'dbghelp.h', 'c', autoadd=true ):
-    conf.env.Append( CCFLAGS='-DHAVE_LIBDBGHELP' )
-  if conf.CheckCHeader( 'crtdbg.h' ):
-    conf.env.Append( CCFLAGS='-DHAVE_CRTDBG_H' )
-  conf.CheckEH()
-  env = conf.Finish()
-
-
-env.Append( CCFLAGS='-Wall' )
-env.Append( CPPPATH=['src/perl_re','src/fpcalc','src/c_syntax','src/py_syntax'] )
-env.Append( LIBS=['m'] )
+# Compile flags
+if not msvc:
+    env.Append( CCFLAGS='-Wall' )
+else:
+    env.Append( CCFLAGS='-W3' )
 
 if env['_DEBUG']:
-  env.Append( CCFLAGS='-D_DEBUG -g -DHEAP_DBG=2' )
+    env.Append( CCFLAGS='-D_DEBUG -DHEAP_DBG=2' )
+    if not msvc:
+        env.Append( CCFLAGS='-g' )
+    else:
+        env.Append( CCFLAGS='-GZ -Zi -MDd' )
 else:
-  env.Append( CCFLAGS='-DNDEBUG -O1' )
+    env.Append( CCFLAGS='-DNDEBUG -O1' )
+    if msvc:
+        env.Append( CCFLAGS='-MD' )
+
+# Different config for the GUI or text console build
+if env['WIN32']:
+    env.Append( CCFLAGS='-DWIN32 -DUSE_WINDOWS')
+    env.Append( LIBS=['gdi32', 'user32'] )
+    if env['_NON_TEXT']:
+        env.Append( CCFLAGS='-D_NON_TEXT' )
+        if not msvc:
+	        env.Append( LINKFLAGS='-mwindows' )
+        else:
+	        env.Append( LINKFLAGS='-subsystem:windows' )
+    else:
+        env.Append( CCFLAGS='-DDARK_BPAL -D_CONSOLE' )
+        if msvc:
+	        env.Append( LINKFLAGS='-subsystem:console' )
+else: # Posix
+  if env['_NON_TEXT']:
+      env.Append( CCFLAGS='-D_NON_TEXT' )
+      env.Append( CPPPATH=['/usr/X11R6/include', '/usr/include/freetype2'] )
+      # use freetype-config --libs and xft-config --libs to get lib names
+      env.Append( LIBPATH=['/usr/X11R6/lib'] )
+      env.Append( LIBS=['Xft','Xrender','X11'] )
+      env.Append( LIBS=['fontconfig','pthread','expat','freetype','z'] )
+  else:
+      env.Append( CCFLAGS='-DDARK_BPAL' )
+      env.Append( LIBS=['curses'] )
+
+# Configuration, but only if we are not cleaning
+if not env.GetOption('clean'):
+    conf = Configure(env, custom_tests={'CheckEH':CheckEH} )
+
+    # Check for dbghelp
+    conf.env.Append( CPPPATH='' ) # Make sure CPPPATH is non-empty
+    save_cpppath = conf.env['CPPPATH']
+    conf.env.Append( CPPPATH='#dbghelp' )
+    if conf.CheckLibWithHeader( 'dbghelp/dbghelp', ['windows.h','dbghelp.h'], 'c', autoadd=true ):
+        conf.env.Append( CCFLAGS='-DHAVE_LIBDBGHELP' )
+    else:
+        conf.env.Replace( CPPPATH=save_cpppath )
+
+    if conf.CheckCHeader( 'crtdbg.h' ):
+        conf.env.Append( CCFLAGS='-DHAVE_CRTDBG_H' )
+
+    conf.CheckEH()
+    env = conf.Finish()
 
 # Cache the updated options
 opts.Save('options.cache', env)
@@ -100,38 +140,46 @@ opts.Save('options.cache', env)
 #
 # Sources
 #
+env.Append( CPPPATH=['src/perl_re','src/fpcalc','src/c_syntax','src/py_syntax'] )
+
 modules = []
 
 if env['WIN32']:
-  modules += env.Object( Split("""
-  	src/ww.c 
-	src/winclip.c
-  """))
-  if env['_NON_TEXT']:
-      modules += env.Object( Split("""
-	      src/gui_kbd.c
-	      src/gui_scr.c
-      """))
-  else:
-      modules += env.Object( Split("""
-	      src/w_kbd.c
-	      src/w_scr.c
-      """))
+    modules += env.Object( Split("""
+          src/ww.c
+          src/winclip.c
+    """))
+    # dirent.c: only needed when compiling with msvc
+    if msvc:
+        modules += env.Object( Split("""
+          src/dirent.c
+        """))
+
+    if env['_NON_TEXT']:
+        modules += env.Object( Split("""
+	        src/gui_kbd.c
+	        src/gui_scr.c
+        """))
+    else:
+        modules += env.Object( Split("""
+	        src/w_kbd.c
+	        src/w_scr.c
+        """))
 else: # Posix
-  modules += env.Object( Split("""
-  	src/wl.c
-  """) )
-  if env['_NON_TEXT']:
-      modules += env.Object( Split("""
-	      src/x_kbd.c
-	      src/x_scr.c
-	      src/xclip.c
-      """))
-  else:
-      modules += env.Object( Split("""
-	      src/l_kbd.c
-	      src/l_scr.c
-      """))
+    modules += env.Object( Split("""
+                src/wl.c
+    """) )
+    if env['_NON_TEXT']:
+        modules += env.Object( Split("""
+	        src/x_kbd.c
+	        src/x_scr.c
+	        src/xclip.c
+        """))
+    else:
+        modules += env.Object( Split("""
+	        src/l_kbd.c
+	        src/l_scr.c
+        """))
 
 # Files from src
 modules += env.Object( Split("""
