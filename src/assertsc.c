@@ -1,9 +1,12 @@
 /*
 
-File: assertsc.h
+File: assertsc.c
 COPYING: Full text of the copyrights statement at the bottom of the file
 Descrition:
   Assert function that shows stack context when condition fails.
+
+Compile time definitions:
+Defined HAVE_LIBDBGHELP -- Use the debug helper library
 
 */
 
@@ -16,13 +19,16 @@ Descrition:
 #endif
 
 #include "global.h"
+#ifdef HAVE_LIBDBGHELP
 #include "dbghelp.h"  /* From Microsoft Windows Platform SDK */
+#endif
 
 #ifdef _WIN32
 #ifdef _DEBUG
 
 void DumpStack(CONTEXT *pContext, int nSkip, HANDLE hThread)
 {
+#ifdef HAVE_LIBDBGHELP
 #ifndef __BOUNDSCHECKER__
   /* We can not call SymInitialize if the program is to be used
   along with BoundsChecker */
@@ -174,6 +180,7 @@ void DumpStack(CONTEXT *pContext, int nSkip, HANDLE hThread)
     printf("\n");
   }
 #endif /* !BoundsChecker */
+#endif /* HAVE_LIBDBGHELP */
 }
 
 void _assert_sc( const char *cond, const char *name, unsigned int line )

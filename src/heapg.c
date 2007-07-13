@@ -20,7 +20,8 @@ Authors:
 #include "global.h"
 #include "clist.h"
 #include "heapg.h"
-#ifdef WIN32
+
+#ifdef HAVE_LIBDBGHELP
 #include "dbghelp.h"  /* From Microsoft Windows Platform SDK */
 #endif
 
@@ -66,7 +67,7 @@ typedef struct dbg_head
   unsigned    size;
   unsigned    line;
   char        file[12];
-  #ifdef WIN32
+  #ifdef HAVE_LIBDBGHELP
   DWORD       stkentries[MAXSTACKTRACE];
   #endif
   unsigned    checkSum;      // ~sum( of bytes before checkSum )
@@ -142,6 +143,7 @@ static unsigned CalcCheckSum ( dbg_head * p )
 //--------------------------------------------------------------------------
 static void StoreStackContext( dbg_head *p )
 {
+  #ifdef HAVE_LIBDBGHELP
   #ifdef WIN32
   HANDLE hProcess;
   HANDLE hThread;
@@ -195,6 +197,7 @@ static void StoreStackContext( dbg_head *p )
       break;
   }
   #endif
+  #endif /* HAVE_LIBDBGHELP */
 }
 
 //--------------------------------------------------------------------------
@@ -205,6 +208,7 @@ static void StoreStackContext( dbg_head *p )
 //--------------------------------------------------------------------------
 static void DumpStackContext( const dbg_head *p )
 {
+  #ifdef HAVE_LIBDBGHELP
   #if defined(WIN32) && !defined(__BOUNDSCHECKER__)  /* BC fails SymInitialize */
   HANDLE hProcess;
   char sModulePath[_MAX_PATH];
@@ -316,6 +320,7 @@ static void DumpStackContext( const dbg_head *p )
     TRACE0("\n");
   }
   #endif
+  #endif /* HAVE_LIBDBGHELP */
 }
 
 //--------------------------------------------------------------------------
@@ -364,7 +369,7 @@ static int IsValidBlockPrim ( dbg_head * p )
   return 0;
 };
 
-#ifdef WIN32
+#ifdef HAVE_CRTDBG_H
 #include <crtdbg.h>
 #endif
 
@@ -379,7 +384,7 @@ void _dbg_validate_heap ( const char * file, unsigned line )
   int err;
   long blkCount;
 
-  #ifdef WIN32
+  #ifdef HAVE_CRTDBG_H
   _CrtCheckMemory();
   #endif
 
