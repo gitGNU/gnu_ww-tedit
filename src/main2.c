@@ -929,7 +929,7 @@ void main2(int argc, char **argv)
   disp_event_clear(&ev);
   ev.t.code = EVENT_USR;
   ev.t.user_msg_code = MSG_SET_FOCUS;
-  ev.data1 = wrkspace;  /* TODO: wrkspace here! */
+  ev.data1 = wrkspace;
   ContainerHandleEvent(pCurrentContainer, &ev);
 
   /*ShowTipsAndTricks();*/ /* temporarely disabled */

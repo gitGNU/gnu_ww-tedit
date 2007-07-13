@@ -519,7 +519,7 @@ void CmdEditFind(void *pCtx)
 _search:
   pFile->bShowBlockCursor = TRUE;
   pFile->bUpdateLine = TRUE;
-  disp_wnd_get_param(0, &wnd_param);  /* TODO: supply disp! */
+  disp_wnd_get_param(disp, &wnd_param);
   Find(pFile, stSearchContext.nDirection, wnd_param.width, &stSearchContext);
   if (!stSearchContext.bSuccess)
     goto _exit;
