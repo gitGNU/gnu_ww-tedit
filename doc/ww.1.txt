@@ -1,0 +1,27 @@
+ww(1)
+=====
+
+NAME
+----
+ww - A powerful fullscreen editor.
+
+SYNOPSIS
+--------
+'ww' <file>...
+
+DESCRIPTION
+-----------
+Edit text files.
+
+OPTIONS
+-------
+None.
+
+BUGS
+----
+There are many known bugs.
+This man page is just a stub.
+
+Author
+------
+Written by Petar Marinov

@@ -6,6 +6,17 @@ env = Environment()
 
 print 'Platform: %s' % env['PLATFORM']
 
+# .txt => .xml asciidoc builder
+env['BUILDERS']['Txt2Xml'] = \
+    Builder( action = 'asciidoc -b docbook -d manpage -o $TARGET $SOURCE',
+             suffix = '.xml',
+             src_suffix = '.txt' )
+
+# .xml  => manpage asciidoc builder
+env['BUILDERS']['Xml2Man'] = \
+    Builder(action = 'xmlto -m doc/callouts.xsl man -o ${TARGET.dir} $SOURCE',
+            src_suffix = '.xml' )
+
 #Uncomment this to see what the environment contains
 #print env.Dump();Exit(0)
 
@@ -277,18 +288,38 @@ modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=Split("""
 """))
 
 prog = env.Program( 'ww', modules )
-Default(prog)
+env.Alias( 'prog', prog )
 
+# Documentation
+man = env.Xml2Man( 'doc/ww.1', env.Txt2Xml( 'doc/ww.1' ) )
+env.Alias( 'man', man )
+
+# All
+all = env.Alias( 'all', [prog,man] )
+Default( all )
 #
 # Prepare are our installation paths:
 # We need to use absolute paths because the path may start with "#" (for )
 #
 env['BINDIR']=env.Dir('$DESTDIR$PREFIX/bin').abspath
 env['SYSCONFDIR']=env.Dir('$DESTDIR/etc').abspath
+env['MANDIR']=env.Dir('$DESTDIR$PREFIX/share/man').abspath
+env['MAN1DIR']='$MANDIR/man1'
 
-inst = env.Command( 'install', prog,  [
+install_bin = env.Command( 'install_bin', prog,  [
   'mkdir -p $BINDIR',
   'install -t $BINDIR $SOURCE',
 ])
-env.AlwaysBuild(inst)
-env.Alias( 'install', inst )
+env.AlwaysBuild(install_bin)
+env.Alias( 'install_bin', install_bin )
+
+
+install_man = env.Command( 'install_man', man, [
+    'install -d -m755 $MAN1DIR',
+    'install -m644 $SOURCE $MAN1DIR'
+])
+env.AlwaysBuild( install_man )
+env.Alias( 'install_man', install_man )
+
+env.Alias( 'install', [install_bin, install_man] )
+
