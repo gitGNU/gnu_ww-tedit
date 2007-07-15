@@ -1,9 +1,22 @@
 How to build WW on different platforms
-2007-07-13
+======================================
 Tzvetan Mikov <tmikov@gmail.com>
+0.1, 2007-07-13
+
+
+Build Dependencies
+------------------
+
+.Linux and Cygwin
+  - x11: xlibs-dev, libxft-dev
+  - text: ncurses-dev
+  - documentation: asciidoc, xmlto
+
+.Win32
+  - dbghelp (optional)
 
 Linux
-=====
+-----
 
 You need SCons:
 
@@ -21,17 +34,19 @@ If you want to cross compile for Windows using mingw32:
   # apt-get install mingw32
   $ scons WIN32=1 _NON_TEXT=(0 or 1)
 
-Cygwin
-======
 
-  Installing SCons
-  ----------------
+
+Cygwin
+------
+
+=== Installing SCons
+
 At this time SCons isn't bundled with Cygwin, but it is easy to setup.
 First you need to make sure you have python installed in Cygwin. Then
 download the latest stable Zip (not source!) distribution from
-www.scons.org . At this time it is:
+http://www.scons.org[]. At this time it is:
 
-  http://prdownloads.sourceforge.net/scons/scons-0.97.zip
+http://prdownloads.sourceforge.net/scons/scons-0.97.zip[]
 
 Note that this is a SF.net link, so you can't use wget :-( Unzip the
 package into a temporary directory, enter it and type:
@@ -39,50 +54,48 @@ package into a temporary directory, enter it and type:
   $ python setup.py install
 
 
-  Building for ncurses and X11
-  ----------------------------
+=== Building for ncurses and X11
 
 The build process is exactly the same as for the Linux native versions.
 You will get a Cygwin-dependent ncurses or X11 binary.
 
 
-  Building for native Win32
-  -------------------------
+=== Building for native Win32
 
-Exactly the same, but you must specify the WIN32=1 option. Under Cygwin
-this invokes gcc with "-mno-cygwin", which causes it to use its own version
+Exactly the same, but you must specify the `WIN32=1` option. Under Cygwin
+this invokes gcc with `-mno-cygwin`, which causes it to use its own version
 of mingw internally.
 
 
 "Vanilla" Windows
-=================
+-----------------
 
-  Installing SCons
-  ----------------
+=== Installing SCons
+
 First you need to install Python. There are Windows installation packages
-at <http://www.python.org/download/>. At the current time the download is:
+at http://www.python.org/download/[]. At the current time the download is:
 
-  http://www.python.org/ftp/python/2.5.1/python-2.5.1.msi
+http://www.python.org/ftp/python/2.5.1/python-2.5.1.msi[]
 
 Then you need to install SCons. There is a Windows installation package at
-<www.scons.org>. At the current time the link is:
+http://www.scons.org[]. At the current time the link is:
 
-  http://prdownloads.sourceforge.net/scons/scons-0.97.win32.exe
+http://prdownloads.sourceforge.net/scons/scons-0.97.win32.exe[]
 
 After you complete both installations, you may need to add the Python
 (e.g. "c:\python25") to your path.
 
 
-  Compiling with MSVC
-  -------------------
+=== Compiling with MSVC
+
 If you have dbghelp, create a subdirectory dbghelp in the project root
 and put dbghelp.h dbghelp.dll and dbghelp.lib there. It will be detected
 during the build.
 
-Then simply run "scons _NON_TEXT=[0 | 1]" to build a GUI or console version.
+Then simply run `scons _NON_TEXT=[0 | 1]` to build a GUI or console version.
 
-  Compiling with MingW (under Windows)
-  ------------------------------------
+=== Compiling with MingW (under Windows)
+
 SCons will autodetect MingW if it is installed and in the path (you must
 have run c:\mingw\setenv.bat).
 
@@ -91,5 +104,5 @@ MSVC. If you have both, and want to force MingW usage, remove the references
 to MSVC from the path.
 
 Once this is setup, compilation should proceed trivially as in all other
-cases: run "scons _NON_TEXT=[0 | 1]" to build a GUI or console version.
+cases: run `scons _NON_TEXT=[0 | 1]` to build a GUI or console version.
 
