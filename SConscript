@@ -20,6 +20,44 @@ env['BUILDERS']['Xml2Man'] = \
     Builder(action = 'xmlto -m doc/callouts.xsl man -o ${TARGET.dir} $SOURCE',
             src_suffix = '.xml' )
 
+
+# yacc and lex builders
+#
+# Define yacc and lex builders which defer to the builtin CFile yacc/lex
+# builder if yacc/lex has been detected on the platform, and otherwise
+# use pregenerated files (with '.gen' extension)
+
+import os.path
+
+def yacc_present ( target, source, **dict ):
+    return env.CFile( target, source, **dict )
+
+def yacc_missing ( target, source, **dict ):
+    header = os.path.splitext( target )[0] + '.h'
+    # Note that each builder, including Command, returns a list
+    return \
+        env.Command( target, target+'.gen', Copy('$TARGET','$SOURCE')) + \
+        env.Command( header, header+'.gen', Copy('$TARGET','$SOURCE'))
+
+def lex_present ( target, source, **dict ):
+    return env.CFile( target, source, **dict )
+
+def lex_missing ( target, source, **dict ):
+    return env.Command( target, target+".gen", Copy('$TARGET','$SOURCE') )
+
+if "yacc" in env['TOOLS']:
+    yacc = yacc_present
+else:
+    print "yacc/bison not detected. Using pregenerated files"
+    yacc = yacc_missing
+
+if "lex" in env['TOOLS']:
+    lex = lex_present
+else:
+    print "lex/flex not detected. Using pregenerated files"
+    lex = lex_missing
+
+
 # Prepare default option values
 if env['PLATFORM'] == 'win32':
     env['WIN32'] = true
@@ -195,13 +233,13 @@ else: # Posix
 # Files from src
 modules += env.Object( Split("""
 	src/assertsc.c
-	src/block2.c 
-	src/block.c 
-	src/blockcmd.c 
-	src/bookm.c 
-	src/bookmcmd.c 
-	src/calccmd.c 
-	src/cmd.c 
+	src/block2.c
+	src/block.c
+	src/blockcmd.c
+	src/bookm.c
+	src/bookmcmd.c
+	src/calccmd.c
+	src/cmd.c
 	src/contain.c
 	src/ctxhelp.c
 	src/debug.c
@@ -259,34 +297,6 @@ modules += env.Object( Split("""
 	src/wrkspace.c
 """))
 
-# ==============
-# src/fpcalc
-#
-
-# If the platform has bison/yacc => use them. Otherwise use our pregenerated
-# files
-
-if ("yacc" in env['TOOLS']):
-  calc_tab = env.CFile( 'src/fpcalc/calc_tab.c', 'src/fpcalc/calc.y', YACCFLAGS='--name-prefix=fcalc_ -d')
-else:
-  print "yacc/bison not detected. Using pregenerated file"
-  calc_tab = [
-    env.Command( 'src/fpcalc/calc_tab.c', 'src/fpcalc/calc_tab.c.gen', Copy('$TARGET','$SOURCE')),
-    env.Command( 'src/fpcalc/calc_tab.h', 'src/fpcalc/calc_tab.h.gen', Copy('$TARGET','$SOURCE')),
-  ]
-
-if ("lex" in env['TOOLS']):
-  lexfcalc = env.CFile( 'src/fpcalc/lexfcalc.c', 'src/fpcalc/scan.l', LEXFLAGS='-Pfcalc_' )
-else:
-  print "lex/flex not detected. Using pregenerated file"
-  lexfcalc =  env.Command( 'src/fpcalc/lexfcalc.c', 'src/fpcalc/lexfcalc.c.gen', Copy('$TARGET','$SOURCE')),
-
-modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=Split("""
-    src/fpcalc/calcfunc.c
-    src/fpcalc/calc_tab.c
-    src/fpcalc/lexfcalc.c
-"""))
-
 # Files from src/perl_re
 modules += env.Object( CCFLAGS="${CCFLAGS} -DSTATIC", target=Split("""
 	src/perl_re/get.c
@@ -295,21 +305,26 @@ modules += env.Object( CCFLAGS="${CCFLAGS} -DSTATIC", target=Split("""
 	src/perl_re/study.c
 """))
 
-# ==============
-# C syntax highlighting
-#
+# src/fpcalc
+modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=[
+    'src/fpcalc/calcfunc.c',
+    yacc( 'src/fpcalc/calc_tab.c', 'src/fpcalc/calc.y', YACCFLAGS='--name-prefix=fcalc_ -d' )[0],
+    lex( 'src/fpcalc/lexfcalc.c', 'src/fpcalc/scan.l', LEXFLAGS='-Pfcalc_' )[0]
+])
 
-modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=Split("""
-	src/c_syntax/c_syntax.c
-    src/c_syntax/synh.c
-	src/c_syntax/funcs.c
-"""))
+
+# C syntax highlighting
+modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=[
+	'src/c_syntax/c_syntax.c',
+	'src/c_syntax/funcs.c',
+    lex( 'src/c_syntax/synh.c', 'src/c_syntax/synh.l' )[0]
+])
 
 # Python syntax highlighting
-modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=Split("""
-    src/py_syntax/py_syntax.c
-    src/py_syntax/py_synh.c
-"""))
+modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=[
+    'src/py_syntax/py_syntax.c',
+    lex( 'src/py_syntax/py_synh.c', 'src/py_syntax/py_synh.l', LEXFLAGS='-Ppy' )[0]
+])
 
 prog = env.Program( 'ww', modules )
 env.Alias( 'prog', prog )
