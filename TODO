@@ -1,4 +1,5 @@
 SHORT-TERM:
+* handle resize signal for ncurses
 * remove most of VALIDATE_HEAP_PTR and VALIDATE_HEAP, which were put temporarely
 * highlight pairs of () and []
 * ctrl+] : goto matching pair

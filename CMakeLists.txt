@@ -11,11 +11,16 @@ ELSE (CYGWIN)
   SET(MY_WIN32 WIN32)
 ENDIF (CYGWIN)
 
-IF (CMAKE_BUILD_TYPE STREQUAL Debug)
+# Debug build by default
+IF (CMAKE_BUILD_TYPE STREQUAL "")
+SET (CMAKE_BUILD_TYPE "Debug")
+ENDIF (CMAKE_BUILD_TYPE STREQUAL "")
+
+IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(dbg_def "-D _DEBUG")
-ELSE (CMAKE_BUILD_TYPE STREQUAL Debug)
-  set(dbg_def "-D _DEBUG")
-ENDIF (CMAKE_BUILD_TYPE STREQUAL Debug)
+ELSE (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(dbg_def)
+ENDIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 # WIN32: use dbghelp library if installed in src/dbghelp
 IF (MY_WIN32 AND EXISTS src/dbghelp/dbghelp.h)

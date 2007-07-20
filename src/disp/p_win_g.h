@@ -137,20 +137,6 @@ int disp_is_valid(const dispc_t *disp);
 #define VALID_DISP(disp) (1)
 #endif
 
-void _disp_ev_q_init(dispc_t *disp);
-void _disp_ev_q_done(dispc_t *disp);
-void _disp_ev_q_put(dispc_t *disp, const disp_event_t *ev);
-int  _disp_ev_q_get(dispc_t *disp, disp_event_t *ev);
-
-void _disp_show_cursor(dispc_t *disp, int caret_is_visible);
-void _disp_set_cursor_pos(dispc_t *disp, int x, int y);
-void _disp_wnd_set_title(dispc_t *disp, const char *title);
-
-void _disp_translate_os_error(dispc_t *disp);
-
-int _disp_init(dispc_t *disp);
-void _disp_done(dispc_t *disp);
-
 /*
 External assert() replacement function can be supplied in the form
 of a define -- D_ASSERT. It must conform to the standard C library

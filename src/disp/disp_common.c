@@ -38,8 +38,13 @@ static char disp_id[] = "disp-lib";
 
 #define DISP_LO_BYTE(x) (unsigned char)((unsigned)(x) & 0xff)
 
-/* Forward definitions of the platform specific functions that are
-called from the top-level API */
+/*
+Forward definitions of the platform specific functions that are
+called from the top-level API.
+
+Implementations are in win32_g_disp.c or ncurs_disp.c, depending
+on which platform the library is compiled.
+*/
 static int s_disp_init(dispc_t *disp);
 static void s_disp_set_cursor_pos(dispc_t *disp, int x, int y);
 static void s_disp_show_cursor(dispc_t *disp, int caret_is_visible);
@@ -48,7 +53,7 @@ static void s_disp_validate_rect(dispc_t *disp,
                                  int w, int h);
 static void s_disp_done(dispc_t *disp);
 static void s_disp_wnd_set_title(dispc_t *disp, const char *title);
-
+static int s_disp_process_events(dispc_t *disp);
 
 /*!
 @brief Returns the size of the dispc (display) object
@@ -247,6 +252,44 @@ void disp_done(dispc_t *disp)
 }
 
 /*!
+@brief Wrapper to call the optional malloc replacement function
+
+@param disp display context
+@param size size to pass to malloc
+*/
+static void *s_disp_malloc(dispc_t *disp, size_t size)
+{
+  void *(*my_malloc)(size_t size);
+
+  my_malloc = disp->safe_malloc;
+  if (my_malloc == NULL)  /* no user established mem handlers? */
+  {
+    /* then use the libc's malloc() and free() */
+    my_malloc = &malloc;
+  }
+  return my_malloc(size);
+}
+
+/*!
+@brief Wrapper to call the optional free() replacement
+
+@param disp display context
+@param p    block address to pass to free()
+*/
+static void s_disp_free(dispc_t *disp, void *p)
+{
+  void (*my_free)(void *buf);
+
+  my_free = disp->safe_free;
+  if (my_free == NULL)  /* no user established mem handlers? */
+  {
+    /* then use the libc's malloc() and free() */
+    my_free = &free;
+  }
+  my_free(p);
+}
+
+/*!
  * @brief allocates memory for the character buffer if necessary
  *
  * disp->char_buf can't be allocated at disp_init() time because we don't know
@@ -263,8 +306,6 @@ static void s_disp_alloc_char_buf(dispc_t *disp)
 {
   int required_size;
   int char_buf_size;
-  void *(*my_malloc)(size_t size);
-  void (*my_free)(void *buf);
 
   required_size = disp->geom_param.height * disp->geom_param.width;
   char_buf_size = disp->buf_height * disp->buf_width;
@@ -275,19 +316,10 @@ static void s_disp_alloc_char_buf(dispc_t *disp)
     return;
   else
   {
-    my_malloc = disp->safe_malloc;
-    my_free = disp->safe_free;
-    if (my_malloc == NULL)  /* no user established mem handlers? */
-    {
-      /* then use the libc's malloc() and free() */
-      my_malloc = &malloc;
-      my_free = &free;
-    }
-
     if (disp->char_buf != NULL)
-      my_free(disp->char_buf);
+      s_disp_free(disp, disp->char_buf);
 
-    disp->char_buf = my_malloc(required_size * sizeof(disp_char_t));
+    disp->char_buf = s_disp_malloc(disp, required_size * sizeof(disp_char_t));
     ASSERT(disp->char_buf != NULL);  /* malloc should've a the safety buffer */
 
     disp->buf_height = disp->geom_param.height;
@@ -1012,6 +1044,29 @@ int  disp_event_is_valid(const disp_event_t *event)
 {
   DISP_REFERENCE(*event);
   return 1;
+}
+
+/*!
+@brief Waits for event from the display window. (win32 GUI)
+
+The function also is the event pump on GUI platforms.
+
+@param disp  a dispc object
+@param event receives the next event
+@return 0 failure in system message loop
+@return 1 no error
+*/
+int disp_event_read(dispc_t *disp, disp_event_t *event)
+{
+  event->t.code = EVENT_NONE;
+  for (;;)
+  {
+    if (s_disp_ev_q_get(disp, event))
+      return 1;
+
+    if (!s_disp_process_events(disp))
+      return 0;
+  }
 }
 
 /*!

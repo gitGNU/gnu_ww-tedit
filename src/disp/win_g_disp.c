@@ -40,6 +40,17 @@ prototype of assert.
 #include "disp_common.c"
 
 /*!
+@brief No need to map palette, stub function (win32 GUI)
+*/
+int disp_map_palette(dispc_t *disp, unsigned char *pal, int num_entries)
+{
+  DISP_REFERENCE(disp);
+  DISP_REFERENCE(pal);
+  DISP_REFERENCE(num_entries);
+  return 1;
+}
+
+/*!
 @brief Gets human readable message for a system error (win32 GUI)
 
 @param disp  a dispc object
@@ -145,27 +156,21 @@ The function also is the event pump on GUI platforms.
 @return 0 failure in system message loop
 @return 1 no error
 */
-int disp_event_read(dispc_t *disp, disp_event_t *event)
+static int s_disp_process_events(dispc_t *disp)
 {
   MSG msg;
 
-  event->t.code = EVENT_NONE;
-  for (;;)
+  if (!GetMessage(&msg, NULL, 0, 0))
   {
-    if (s_disp_ev_q_get(disp, event))
-      return 1;
-
-    if (!GetMessage(&msg, NULL, 0, 0))
-    {
-      disp->code = DISP_MESSAGE_LOOP_FAILURE;
-      _snprintf(disp->error_msg, sizeof(disp->error_msg),
-                "failed to get message");
-      s_disp_translate_os_error(disp);
-      return 0;
-    }
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
+    disp->code = DISP_MESSAGE_LOOP_FAILURE;
+    _snprintf(disp->error_msg, sizeof(disp->error_msg),
+              "failed to get message");
+    s_disp_translate_os_error(disp);
+    return 0;
   }
+  TranslateMessage(&msg);
+  DispatchMessage(&msg);
+  return 1;
 }
 
 /*!

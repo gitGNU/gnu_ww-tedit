@@ -68,6 +68,16 @@ enum disp_error
   DISP_MESSAGE_LOOP_FAILURE,
   /*! failed to set a timer */
   DISP_FAILED_TIMER_SETUP,
+  /*! ncurses failed to initialize */
+  DISP_FAILED_NCURS_INIT,
+  /*! terminal doesn't support cursor operations */
+  DISP_TERMINAL_NO_CURSOR_OPERATIONS,
+  /*! terminal doesn't support color */
+  DISP_TERMINAL_NO_COLOR,
+  /*! ncurses mode setup failure */
+  DISP_NCURSES_MODE_SETUP_FAILURE,
+  /*! memory error in map palette */
+  DISP_NCURSES_MEM_FAIL,
 };
 
 void disp_error_get(dispc_t *disp, enum disp_error *code,
@@ -115,6 +125,7 @@ void disp_set_resize_handler(dispc_t *disp,
                                                    void *ctx),
                              void *handle_resize_ctx);
 
+int disp_map_palette(dispc_t *disp, unsigned char *pal, int num_entries);
 void disp_cbuf_reset(const dispc_t *disp, disp_char_buf_t *cbuf, int max_characters);
 void disp_cbuf_mark_invalid(const dispc_t *disp, disp_char_buf_t *cbuf);
 void disp_cbuf_put_char(const dispc_t *disp,

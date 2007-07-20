@@ -19,6 +19,14 @@ This creates makefile for nmake. To build after that, only type `nmake'.
 
 ====== Build for Linux
 
+Create directoriy for the debug binaries, ww_ncurs_dbg. Make it current
+so that the source is in ../src. From there execute
+
+`cmake -G  "Unix Makefiles" ..'
+
+This creates makefile for GNU make. To build after that, only type `make'.
+
+
 ====== Doxygen
 
 `Doxyfile' is the configuration for Doxygen. Inside 'Doxyfile' search for
