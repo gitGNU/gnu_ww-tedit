@@ -4,6 +4,9 @@ false = 0
 # This is the build environment
 env = Environment()
 
+#Uncomment this to see what the environment contains
+#print env.Dump();Exit(0)
+
 print 'Platform: %s' % env['PLATFORM']
 
 # .txt => .xml asciidoc builder
@@ -16,9 +19,6 @@ env['BUILDERS']['Txt2Xml'] = \
 env['BUILDERS']['Xml2Man'] = \
     Builder(action = 'xmlto -m doc/callouts.xsl man -o ${TARGET.dir} $SOURCE',
             src_suffix = '.xml' )
-
-#Uncomment this to see what the environment contains
-#print env.Dump();Exit(0)
 
 # Prepare default option values
 if env['PLATFORM'] == 'win32':
@@ -259,11 +259,32 @@ modules += env.Object( Split("""
 	src/wrkspace.c
 """))
 
-# Files from src/fpcalc
+# ==============
+# src/fpcalc
+#
+
+# If the platform has bison/yacc => use them. Otherwise use our pregenerated
+# files
+
+if ("yacc" in env['TOOLS']):
+  calc_tab = env.CFile( 'src/fpcalc/calc_tab.c', 'src/fpcalc/calc.y', YACCFLAGS='--name-prefix=fcalc_ -d')
+else:
+  print "yacc/bison not detected. Using pregenerated file"
+  calc_tab = [
+    env.Command( 'src/fpcalc/calc_tab.c', 'src/fpcalc/calc_tab.c.gen', Copy('$TARGET','$SOURCE')),
+    env.Command( 'src/fpcalc/calc_tab.h', 'src/fpcalc/calc_tab.h.gen', Copy('$TARGET','$SOURCE')),
+  ]
+
+if ("lex" in env['TOOLS']):
+  lexfcalc = env.CFile( 'src/fpcalc/lexfcalc.c', 'src/fpcalc/scan.l', LEXFLAGS='-Pfcalc_' )
+else:
+  print "lex/flex not detected. Using pregenerated file"
+  lexfcalc =  env.Command( 'src/fpcalc/lexfcalc.c', 'src/fpcalc/lexfcalc.c.gen', Copy('$TARGET','$SOURCE')),
+
 modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=Split("""
-        src/fpcalc/calcfunc.c
-        src/fpcalc/calc_tab.c
-        src/fpcalc/lexfcalc.c
+    src/fpcalc/calcfunc.c
+    src/fpcalc/calc_tab.c
+    src/fpcalc/lexfcalc.c
 """))
 
 # Files from src/perl_re
@@ -274,17 +295,20 @@ modules += env.Object( CCFLAGS="${CCFLAGS} -DSTATIC", target=Split("""
 	src/perl_re/study.c
 """))
 
+# ==============
 # C syntax highlighting
+#
+
 modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=Split("""
 	src/c_syntax/c_syntax.c
-        src/c_syntax/synh.c
+    src/c_syntax/synh.c
 	src/c_syntax/funcs.c
 """))
 
 # Python syntax highlighting
 modules += env.Object( CCFLAGS="${CCFLAGS} -DYY_NO_UNPUT", target=Split("""
-        src/py_syntax/py_syntax.c
-        src/py_syntax/py_synh.c
+    src/py_syntax/py_syntax.c
+    src/py_syntax/py_synh.c
 """))
 
 prog = env.Program( 'ww', modules )
