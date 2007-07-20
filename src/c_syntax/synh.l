@@ -274,7 +274,7 @@ int main ( void )
       if (OutAttr[i] == 0)
         break;
       else
-        OutAttr[i] = translate[OutAttr[i]];
+        OutAttr[i] = translate[ OutAttr[i] ];
     printf( "%s\n%s ->%d, %d:%d\n", OutText, OutAttr, YY_START, BracketLevel, bZero);
   };
 
