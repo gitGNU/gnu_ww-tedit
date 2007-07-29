@@ -152,7 +152,6 @@ static void s_disp_validate_rect(dispc_t *disp,
 The function also is the event pump on GUI platforms.
 
 @param disp  a dispc object
-@param event receives the next event
 @return 0 failure in system message loop
 @return 1 no error
 */

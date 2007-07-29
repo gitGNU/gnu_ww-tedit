@@ -76,8 +76,8 @@ enum disp_error
   DISP_TERMINAL_NO_COLOR,
   /*! ncurses mode setup failure */
   DISP_NCURSES_MODE_SETUP_FAILURE,
-  /*! memory error in map palette */
-  DISP_NCURSES_MEM_FAIL,
+  /*! failed in allocating color pairs */
+  DISP_NCURSES_COLOR_ALLOC_FAIL,
 };
 
 void disp_error_get(dispc_t *disp, enum disp_error *code,

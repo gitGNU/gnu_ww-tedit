@@ -40,62 +40,83 @@ prototype of assert.
 #define DISP_COUNTOF(x)  (sizeof(x) / sizeof((x)[0]))
 
 /*!
-@brief
+@brief Maps DOS palette to ncurses color pairs (ncurses)
 
-Use a byte as color/background combination from a
-PC palette to get the CURSES color/backgraound color pair index.
-Notice that not all the entries in the array will
-have their CURSES pair counterpart. As CURSES can
-have up to 64 color pair definitions at one and the same time.
-   Generates PaletteToPairs[] and the actual pairs for all
-   the entries in pPalette.
+Use a byte as color/background combination from a PC palette to get the
+CURSES color/backgraound color pair index. Not all the entries in the
+array will have their CURSES pair counterpart. As CURSES can have up to
+64 color pair definitions at one and the same time.
 
-@return 0 failure in system message loop
+@param disp        a dispc object
+@param pal         DOS palette
+@param num_entries size of palette
+
+@return 0 failure in allocating ncurses color pairs
 @return 1 no error
 */
 int disp_map_palette(dispc_t *disp, unsigned char *pal, int num_entries)
 {
-  int pal_map_size8;
-  int pal_flags_size8;
-
-  /*
-  Allocate palette map buffers
-  */
-  pal_map_size8 = num_entries * sizeof(disp->palette_to_color_pairs[0]);
-  disp->palette_to_color_pairs = s_disp_malloc(disp, pal_map_size8);
-  if (disp->palette_to_color_pairs = NULL)
+  /* Use PC color as index to get CURSES color constant */
+  static unsigned char PC_TO_CURSES[8] =
   {
-    disp->code = DISP_NCURSES_MEM_FAIL;
-    snprintf(disp->error_msg, sizeof(disp->error_msg),
-             "no memory to place palette map");
-    return 0;
-  }
+    COLOR_BLACK,
+    COLOR_BLUE,
+    COLOR_GREEN,
+    COLOR_CYAN,
+    COLOR_RED,
+    COLOR_MAGENTA,
+    COLOR_YELLOW,
+    COLOR_WHITE
+  };
+  int r;
+  int i;
+  int c;
+  int b;
+  int should_set_to_bold;
+  int pair_index;
 
-  pal_flags_size8 = num_entries * sizeof(disp->palette_flags[0]);
-  disp->palette_flags = s_disp_malloc(disp, pal_flags_size8);
-  if (disp->palette_flags = NULL)
-  {
-    disp->code = DISP_NCURSES_MEM_FAIL;
-    snprintf(disp->error_msg, sizeof(disp->error_msg),
-             "no memory to place palette map flags");
-    s_disp_free(disp, disp->palette_to_color_pairs);
-    return 0;
-  }
+  ASSERT(pal != NULL);
+  ASSERT(num_entries > 0);
 
-  memset(&disp->palette_flags, 0, pal_flags_size8);
+  memset(disp->palette_flags, 0, sizeof(disp->palette_flags));
+  memset(disp->palette_to_color_pairs, 0, sizeof(disp->palette_to_color_pairs));
 
   /*
   Enumerate all user palette entries and generate
   a new color pair for the ncurses library
   */
+  pair_index = 1;  /* pair color ID for ncurses allocation */
+  for (i = 0; i < num_entries; ++i)
+  {
+    c = pal[i] & 0x0f;
+    b = pal[i] >> 4;
+    should_set_to_bold = 0;
+    if (c >= 8)
+    {
+      c -= 8;
+      should_set_to_bold = 1;
+    }
+    r = init_pair(pair_index, PC_TO_CURSES[c], PC_TO_CURSES[b]);
+    if (r == ERR)
+    {
+      disp->code = DISP_NCURSES_COLOR_ALLOC_FAIL;
+      snprintf(disp->error_msg, sizeof(disp->error_msg),
+               "failed to allocate ncurses color pairs");
+      return 0;
+    }
+
+    disp->palette_to_color_pairs[pal[i]] = pair_index;
+    disp->palette_flags[pal[i]].set_bold = should_set_to_bold;
+    disp->palette_flags[pal[i]].defined = 1;
+
+    ++pair_index;
+  }
+
   return 1;
 }
 
 /*!
-@brief Marks that area of the window has been changed. (win32 GUI)
-
-Call to this function will eventually make the text of the area
-appear on the output window.
+@brief Updates area of the screen with data from the screen buffer (ncurses)
 
 @param disp  a dispc object
 @param x    upper left corner coordinates of the destination rectangle
@@ -107,16 +128,75 @@ static void s_disp_validate_rect(dispc_t *disp,
                                  int x, int y,
                                  int w, int h)
 {
+  disp_char_t *char_ln;
+  chtype *ncurs_buf;
+  int ncurs_buf_size;
+  chtype *p;
+  int i;
+  int j;
+  int c;
+  int a;
+  int r;
+
+  ASSERT(VALID_DISP(disp));
+  ASSERT(x >= 0);
+  ASSERT(y >= 0);
+  ASSERT(w > 0);
+  ASSERT(h > 0);
+  ASSERT(w < disp->geom_param.width);
+  ASSERT(h < disp->geom_param.height);
+
+  ncurs_buf_size = disp->geom_param.width * sizeof(chtype);
+  ncurs_buf = alloca(ncurs_buf_size);
+
+  ASSERT(ncurs_buf != NULL);  /* no escape from here */
+
+  for (i = 0; i < h; ++i)
+  {
+    char_ln = s_disp_buf_access(disp, x, y + i);
+
+    /* prepare a line inside disp_buf */
+    for (j = 0; j < w; ++j)
+    {
+      c = char_ln[j].c;
+      a = char_ln[j].a;
+      p = ncurs_buf + j;
+
+      /* put char */
+      *p &= 0xffffff00;
+      *p |= c;
+      /* put attr */
+      *p &= 0xff;
+      ASSERT(disp->palette_flags[a].defined);
+      *p |= COLOR_PAIR(disp->palette_to_color_pairs[a]);
+      if (disp->palette_flags[a].set_bold)
+        *p |= A_BOLD;
+    }
+
+    r = mvaddchnstr(y + i, x, ncurs_buf, w);
+    ASSERT(r != ERR);
+  }
 }
 
 /*!
-@brief Makes the caret visible or invisible (win32 GUI)
+@brief Makes the caret visible or invisible (ncurses)
 
 @param disp              a dispc object
 @param caret_is_visible  new state of the caret
 */
 static void s_disp_show_cursor(dispc_t *disp, int caret_is_visible)
 {
+  if (disp->cursor_is_visible != caret_is_visible)
+  {
+    disp->cursor_is_visible = caret_is_visible;
+    if (disp->window_holds_focus)
+    {
+      if (caret_is_visible)
+        curs_set(1);
+      else
+        curs_set(0);
+    }
+  }
 }
 
 #if 0
@@ -533,7 +613,7 @@ string F31 = "\033[[G"
 */
 
 /*!
-@brief Gets some keydefs string from terminal's capabilities
+@brief Gets some keydefs string from terminal's capabilities (ncurses)
 
 For some of the keys of the keyboard there are methods (tigetstr) to ask
 the terminal what are the correspondent string sequences that it emits when
@@ -587,7 +667,6 @@ static void s_disp_get_ncurses_keys(dispc_t *disp)
 The function also is the event pump on ncurses platforms.
 
 @param disp  a dispc object
-@param event receives the next event
 @return 0 failure in system message loop
 @return 1 no error
 */
@@ -651,7 +730,7 @@ static int s_disp_init(dispc_t *disp)
 }
 
 /*!
-@brief platform specific disp cleanup (win32 GUI)
+@brief platform specific disp cleanup (ncurses)
 
 @param disp  a display object
 */
@@ -665,7 +744,7 @@ static void s_disp_done(dispc_t *disp)
 }
 
 /*!
-@brief Sets the caret on a specific position (win32 GUI)
+@brief Sets the caret on a specific position (ncurses)
 
 @param disp  a display object
 @param x     coordinates in character units
@@ -673,10 +752,16 @@ static void s_disp_done(dispc_t *disp)
 */
 static void s_disp_set_cursor_pos(dispc_t *disp, int x, int y)
 {
+  int r;
+
+  r = move(y, x);
+  ASSERT(r != ERR);
+  r = refresh();
+  ASSERT(r != ERR);
 }
 
 /*!
-@brief Changes the title of the window (win32 GUI)
+@brief Changes the title of the window (ncurses)
 
 @param disp    a dispc object
 @param title   a string for the title

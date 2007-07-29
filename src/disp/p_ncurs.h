@@ -79,12 +79,12 @@ struct dispc
   int last_x;
   int last_y;
 
-  unsigned char *palette_to_color_pairs;
+  unsigned char palette_to_color_pairs[256];
   struct
   {
     unsigned char set_bold:1;
     unsigned char defined:1;
-  } *palette_flags;
+  } palette_flags[256];
 
   unsigned int ev_c;
   unsigned int ev_h;
