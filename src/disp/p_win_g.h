@@ -1,6 +1,6 @@
 /*!
 @file p_win_g.h
-@brief WIN32 GUI platform specific implementation of the console API
+@brief [disp] WIN32 GUI platform specific implementation of the console API
 
 Private definitions specific to the WIN32 GUI implementation of the
 console API.

@@ -153,7 +153,7 @@ IF (MY_WIN32)
   TARGET_LINK_LIBRARIES(ww ${dbghelp_lib})
 ELSE (MY_WIN32)
   ADD_EXECUTABLE(ww ${ww_src})
-  TARGET_LINK_LIBRARIES(ww)
+  TARGET_LINK_LIBRARIES(ww curses)
 ENDIF (MY_WIN32)
 
 IF (MY_WIN32)
@@ -161,4 +161,13 @@ SET_TARGET_PROPERTIES(ww PROPERTIES
                       LINK_FLAGS_DEBUG "/incremental:no"
                       LINK_FLAGS_RELEASE "/incremental:no")
 ENDIF (MY_WIN32)
+
+IF (UNIX)
+# --enable-auto-imports: it is for the GNU linker on cygwin
+# to suppress "resolving _stdscr by linking to __imp__stdscr (auto-import)"
+# linker is called via gcc, -Xlinker to pass the option to the linker
+SET_TARGET_PROPERTIES(ww PROPERTIES
+                      LINK_FLAGS_DEBUG "-Xlinker --enable-auto-import"
+                      LINK_FLAGS_RELEASE "-Xlinker --enable-auto-import")
+ENDIF (UNIX)
 

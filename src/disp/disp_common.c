@@ -1,6 +1,6 @@
 /*!
 @file disp_common.c
-@brief Platform independent top level API impelementation. An include file.
+@brief [disp] Platform independent top level API impelementation. An include file.
 
 @section a Header
 
@@ -37,6 +37,14 @@ static char disp_id[] = "disp-lib";
 #endif
 
 #define DISP_LO_BYTE(x) (unsigned char)((unsigned)(x) & 0xff)
+
+/* To be used in ASSERT()! */
+#ifdef _DEBUG
+static int s_disp_cbuf_is_valid(const disp_char_buf_t *cbuf);
+#define VALID_DISP_CHAR_BUF(cbuf) (s_disp_cbuf_is_valid(cbuf))
+#else
+#define VALID_DISP_CHAR_BUF(cbuf) (1)
+#endif
 
 /*
 Forward definitions of the platform specific functions that are
@@ -89,7 +97,7 @@ them one by one
 
 @param disp a dispc object
 */
-void s_disp_ev_q_init(dispc_t *disp)
+static void s_disp_ev_q_init(dispc_t *disp)
 {
   ASSERT(VALID_DISP(disp));
   disp->ev_c = disp->ev_h = disp->ev_t = 0;
@@ -100,7 +108,7 @@ void s_disp_ev_q_init(dispc_t *disp)
 
 @param disp a dispc object
 */
-void s_disp_ev_q_done(dispc_t *disp)
+static void s_disp_ev_q_done(dispc_t *disp)
 {
   ASSERT(VALID_DISP(disp));
 }
@@ -111,7 +119,7 @@ void s_disp_ev_q_done(dispc_t *disp)
 @param disp  a dispc object
 @param ev    the event to copy in the queue
 */
-void s_disp_ev_q_put(dispc_t *disp, const disp_event_t *ev)
+static void s_disp_ev_q_put(dispc_t *disp, const disp_event_t *ev)
 {
   ASSERT(VALID_DISP(disp));
 
@@ -129,7 +137,7 @@ void s_disp_ev_q_put(dispc_t *disp, const disp_event_t *ev)
 @param disp  a dispc object
 @param ev    memory where the event will be copyed
 */
-int s_disp_ev_q_get(dispc_t *disp, disp_event_t *ev)
+static int s_disp_ev_q_get(dispc_t *disp, disp_event_t *ev)
 {
   ASSERT(VALID_DISP(disp));
 
@@ -310,7 +318,7 @@ static void s_disp_alloc_char_buf(dispc_t *disp)
   required_size = disp->geom_param.height * disp->geom_param.width;
   char_buf_size = disp->buf_height * disp->buf_width;
 
-  ASSERT(required_size > 0);
+  ASSERT(required_size >= 0);
 
   if (char_buf_size >= required_size)
     return;
@@ -445,7 +453,7 @@ void disp_set_resize_handler(dispc_t *disp,
 @returns false cbuf points to memory that is no an object of
                type disp_char_buf_t
 */
-int s_disp_cbuf_is_valid(const disp_char_buf_t *cbuf)
+static int s_disp_cbuf_is_valid(const disp_char_buf_t *cbuf)
 {
   if (cbuf == NULL)
     return 0;
@@ -604,7 +612,7 @@ static disp_char_t* s_disp_buf_access(dispc_t *disp, int x, int y)
 }
 
 #ifdef _DEBUG
-static void disp_is_inside_disp_buf(dispc_t *disp, disp_char_t *dest, int width)
+static void s_disp_is_inside_disp_buf(dispc_t *disp, disp_char_t *dest, int width)
 {
   disp_char_t *last_buf_pos;  /* end point of disp->char_buf */
   disp_char_t *last_dest_pos;  /* somewhere inside disp->char_buf */
@@ -649,7 +657,7 @@ void disp_put_block(dispc_t *disp,
     char_ln = s_disp_buf_access(disp, x, y + ln);
 
     ASSERT((ln * w + w) < buf->max_characters);  /* valid source */
-    disp_is_inside_disp_buf(disp, char_ln, w);  /* valid dest */
+    s_disp_is_inside_disp_buf(disp, char_ln, w);  /* valid dest */
 
     /* Find the range of the line that has changed against what is on screen */
     range_start = -1;
@@ -745,7 +753,7 @@ void disp_write(dispc_t *disp,
 
   char_ln = s_disp_buf_access(disp, x, y);
 
-  disp_is_inside_disp_buf(disp, char_ln, len);
+  s_disp_is_inside_disp_buf(disp, char_ln, len);
 
   /*
   Put characters into the screen buffer
@@ -820,7 +828,7 @@ void disp_flex_write(dispc_t *disp,
 
   char_ln = s_disp_buf_access(disp, x, y);
 
-  disp_is_inside_disp_buf(disp, char_ln, len);
+  s_disp_is_inside_disp_buf(disp, char_ln, len);
 
   /*
   Put characters into the screen buffer
@@ -896,7 +904,7 @@ void disp_fill(dispc_t *disp, char c, int attr, int x, int y, int count)
     return;
 
   char_ln = s_disp_buf_access(disp, x, y);
-  disp_is_inside_disp_buf(disp, char_ln, count);
+  s_disp_is_inside_disp_buf(disp, char_ln, count);
 
   /*
   Put characters into the screen buffer

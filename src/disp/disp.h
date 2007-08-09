@@ -1,7 +1,7 @@
 /*!
 
 @file disp.h
-@brief Multiplatform console API. Public interface file.
+@brief [disp] Multiplatform console API. Public interface file.
 
 @section a Header
 
@@ -83,14 +83,6 @@ enum disp_error
 void disp_error_get(dispc_t *disp, enum disp_error *code,
                     char **error, char **os_error);
 void disp_error_clear(dispc_t *disp);
-
-/* To be used in ASSERT()! */
-#ifdef _DEBUG
-int s_disp_cbuf_is_valid(const disp_char_buf_t *cbuf);
-#define VALID_DISP_CHAR_BUF(cbuf) (s_disp_cbuf_is_valid(cbuf))
-#else
-#define VALID_DISP_CHAR_BUF(cbuf) (1)
-#endif
 
 void disp_set_safemem_proc(dispc_t *disp,
                         void *(*safe_malloc)(size_t size),
@@ -328,10 +320,18 @@ disp library
 --main event loop\n
 
 Files:
-disp_common.c are the top level API functions, it is included in the
+
+disp_common.c -- the top level API functions, it is included in the
 platform specific implementations.
 
-win_g_disp.c are the WIN32 GUI emulation functions. It includes disp_common.c
+win_g_disp.c -- WIN32 GUI emulation functions. It includes disp_common.c
+
+ncurs_disp.c -- ncurses functions. It includes disp_common.c
+
+Depends:
+
+disp depends only on standard libraries
+
 */
 
 #endif  /* ifndef DISP_H */

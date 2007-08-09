@@ -1,6 +1,6 @@
 /*!
 @file p_ncurs.h
-@brief ncurses platform specific implementation of the console API
+@brief [disp] ncurses platform specific implementation of the console API
 
 Private definitions specific to the ncurses implementation of the
 console API.

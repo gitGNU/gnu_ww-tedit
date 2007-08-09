@@ -916,6 +916,8 @@ void main2(int argc, char **argv)
   if (!disp_init(&wnd_param, disp))
     return;  /* fatal init problem */
   disp_set_safemem_proc(disp, disp_safe_malloc, disp_safe_free);
+  if (!disp_map_palette(disp, CPalette, MAX_PALETTE))
+    return;  /* fatal init problem */
   wrkspace_set_disp(wrkspace, disp);
   InstallClipboardMonitor(disp);
   bWrkSpaceInitOK = InitAndRestoreWorkspace(argv,

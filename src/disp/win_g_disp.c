@@ -1,6 +1,6 @@
 /*!
 @file win_g_disp.c
-@brief WIN32 GUI platform specific implementation of the console API
+@brief [disp] WIN32 GUI platform specific implementation of the console API
 
 @section a Header
 

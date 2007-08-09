@@ -1,6 +1,6 @@
 /*!
 @file ncurs_disp.c
-@brief ncurses platform specific implementation of the console API
+@brief [disp] ncurses platform specific implementation of the console API
 
 @section a Header
 
@@ -30,6 +30,7 @@ prototype of assert.
 #include <stdio.h>
 #include <malloc.h>
 #include <curses.h>
+#include <sys/time.h>
 
 #include "disp.h"
 #include "p_ncurs.h"
@@ -88,6 +89,12 @@ int disp_map_palette(dispc_t *disp, unsigned char *pal, int num_entries)
   pair_index = 1;  /* pair color ID for ncurses allocation */
   for (i = 0; i < num_entries; ++i)
   {
+    /* define specific color+background combination only once           */
+    /* tip: col+background is a byte and palette_flags[] is of size 256 */
+    if (disp->palette_flags[pal[i]].defined)
+      continue;
+
+    /* new color+background combination */
     c = pal[i] & 0x0f;
     b = pal[i] >> 4;
     should_set_to_bold = 0;
@@ -143,8 +150,10 @@ static void s_disp_validate_rect(dispc_t *disp,
   ASSERT(y >= 0);
   ASSERT(w > 0);
   ASSERT(h > 0);
-  ASSERT(w < disp->geom_param.width);
-  ASSERT(h < disp->geom_param.height);
+  ASSERT(w <= disp->geom_param.width);
+  ASSERT(h <= disp->geom_param.height);
+
+  disp->paint_is_suspended = 0;
 
   ncurs_buf_size = disp->geom_param.width * sizeof(chtype);
   ncurs_buf = alloca(ncurs_buf_size);
@@ -662,6 +671,127 @@ static void s_disp_get_ncurses_keys(dispc_t *disp)
 }
 
 /*!
+@brief Reads the shift state of linux console terminal, text mode only
+
+Reads the shift state of the keyboard by using
+a semi-documented ioctl() call the Linux kernel.
+
+@returns the shift state
+*/
+static unsigned int s_disp_get_console_shift_state(void)
+{
+#ifdef LINUX
+  int arg;
+  unsigned state;
+
+  arg = 6;  /* TIOCLINUX function #6 */
+  state = 0;
+
+  if (ioctl(fileno(stdin), TIOCLINUX, &arg) == 0)
+    shift = arg;
+
+  return shift;
+#else
+  return 0;
+#endif
+}
+
+#define DISP_SLEEP_TIME 25000  /* Wait for character with timeout 25ms */
+#define DISP_KEY_TIMEOUT 100000  /* 100ms time-out inbetween 2 characters */
+
+/*!
+@brief Waits for a character on the console with timeout
+
+A non-blocking fread() on the console after this call is guaranteed to return
+at least one character.
+
+When function returns with 0 (no character waiting) it may mean that
+timeout expired or that signal was received by the process. In both cases
+elapsed_time should be a valid value.
+
+@param elapsed_time output: how much time elapsed waiting for a character
+       in miliseconds (0 or 25000 miliseconds)
+@return 0 no character
+@return 1 character waiting on the console
+*/
+static int s_disp_wait_console(int *elapsed_time)
+{
+  fd_set rset;
+  struct timeval tv;
+  int num_files_ready;
+
+  FD_ZERO(&rset);
+  FD_SET(fileno(stdin), &rset);
+
+  tv.tv_sec = 0;
+  tv.tv_usec = DISP_SLEEP_TIME;
+
+  num_files_ready = select(fileno(stdin) + 1, &rset, NULL, NULL, &tv);
+
+  if (num_files_ready == 0)  /* time out? */
+    *elapsed_time = DISP_SLEEP_TIME;
+  else
+    *elapsed_time = 0;
+
+  return num_files_ready > 0;
+}
+
+/*!
+@brief Checks if there are more pending characters on the stdin
+
+Waits with no timout.
+
+@return 0 -- no characters waiting
+@return 1 -- at least one character waiting
+*/
+static int s_disp_character_is_waiting(void)
+{
+  fd_set rset;
+  int num_files_ready;
+
+  FD_ZERO(&rset);
+  FD_SET(fileno(stdin), &rset);
+
+  return select(fileno(stdin) + 1, &rset, NULL, NULL, NULL) > 0;
+}
+
+/*!
+@brief matches key sequence against the table of key sequences
+
+@param key_buf     key sequence in asciiz format
+@param key         returns key here if sequence is recognized
+@param shift_state returns the shift state
+
+@returns 0  sequence is not recognized
+@returns 1  sequence is a partial match
+@returns 2  sequence is a complete patch
+*/
+static int s_match_key_sequence(char *key_buf,
+                                unsigned long *key, unsigned *shift_state)
+{
+  int i;
+  int key_buf_len;
+
+  key_buf_len = strlen(key_buf);
+  for (i = 0; i < DISP_COUNTOF(s_keys); ++i)
+  {
+    if (strncmp(key_buf, s_keys[i].esq_seq, key_buf_len) == 0)  /* match? */
+    {
+      if (strlen(s_keys[i].esq_seq) == key_buf_len)  /* complete match? */
+      {
+        debug_trace("[match] ", key_buf);
+        *shift_state = s_disp_get_console_shift_state();
+        *key = s_keys[i].key | (*shift_state << 16);
+        return 2;
+      }
+      else
+        return 1;  /* partial match */
+    }
+  }
+  return 0;
+}
+
+/*!
 @brief Waits for event from the display window. (ncurses)
 
 The function also is the event pump on ncurses platforms.
@@ -672,6 +802,119 @@ The function also is the event pump on ncurses platforms.
 */
 static int s_disp_process_events(dispc_t *disp)
 {
+  int miliseconds;
+  int key_wait_time;
+  int elapsed_time;
+  int character_is_ready;
+  char key_buf[10];
+  int key_cnt;
+  enum key_defs scan_code;
+  unsigned int shift_state;
+  unsigned long key;
+  char c;
+  disp_event_t ev;
+
+  refresh();  /* update screen */
+
+  miliseconds = 0;
+  key_wait_time = 0;
+  key_cnt = 0;
+
+  for (;;)
+  {
+    character_is_ready = s_disp_wait_console(&elapsed_time);
+    miliseconds += elapsed_time;
+    key_wait_time += elapsed_time;
+
+    if (!character_is_ready)
+    {
+      if (miliseconds > 5000000)  /* 5sec waiting? */
+      {
+        miliseconds = 0;
+        disp_event_clear(&ev);
+        ev.t.code = EVENT_TIMER_5SEC;
+        s_disp_ev_q_put(disp, &ev);
+        debug_trace("event-timer-5sec\n");
+        return 1;
+      }
+
+      if (key_wait_time > DISP_KEY_TIMEOUT)
+      {
+        /* check for a single ESC key */
+        if (key_cnt == 1 && key_buf[0] == '\x1b')
+        {
+           debug_trace("ESC\n");
+           disp_event_clear(&ev);
+           ev.t.code = EVENT_KEY;
+           ev.e.kbd.scan_code_only = kbEsc;
+           ev.e.kbd.shift_state = 0;
+           ev.e.kbd.key = KEY(0, kbEsc);
+           s_disp_ev_q_put(disp, &ev);
+           return 1;
+        }
+        else
+        {
+          /* time-out cancel the sequence */
+          key_wait_time = 0;
+          if (key_cnt > 0)
+            key_cnt = 0;
+        }
+      }
+    }
+    else  /* character is now ready */
+    {
+      c = getch();
+
+      debug_trace("%c ", c);
+      /* Rule: we can have 0x1b (ESC) only at the start */
+      if (c == '\x1b' && key_cnt > 1)  /* adding esc at end of collection? */
+      {
+        key_cnt = 0;  /* scrap it! */
+        debug_trace("scrap");
+      }
+
+      /* Add character to the key sequence */
+      key_buf[key_cnt++] = c;
+      key_buf[key_cnt] = '\0';  /* make key_buf to be assciiz */
+
+      switch (s_match_key_sequence(key_buf, &key, &shift_state))
+      {
+        case 0:  /* no match */
+          {
+          char *p;
+          debug_trace("unrecognized sequence\n");
+          debug_trace(": ");
+          while (*p != '\0')
+            debug_trace("%x ", *p++);
+          debug_trace("\n");
+          }
+          break;
+
+        case 1: /* partial match */
+          debug_trace("partial match\n");
+          break;
+
+        case 2: /* complete match */
+          scan_code = (unsigned char)((key >> 16) & 255);
+          {
+          char key_name_buf[24];
+          disp_get_key_name(disp, key, key_name_buf, sizeof(key_name_buf));
+          debug_trace("sys_key: %s, ascii: %c\n", key_name_buf, key & 0xff);
+          }
+
+          disp_event_clear(&ev);
+          ev.t.code = EVENT_KEY;
+          ev.e.kbd.scan_code_only = scan_code;
+          ev.e.kbd.shift_state = shift_state;
+          ev.e.kbd.key = key;
+          s_disp_ev_q_put(disp, &ev);
+          return 1;
+
+        default:
+          ASSERT(0);
+      }
+    }
+  }
 }
 
 /*!
@@ -725,6 +968,8 @@ static int s_disp_init(dispc_t *disp)
   }
 
   s_disp_get_ncurses_keys(disp);
+
+  getmaxyx(stdscr, disp->geom_param.height, disp->geom_param.width);
 
   return 1;
 }
