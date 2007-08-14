@@ -873,6 +873,12 @@ static int s_disp_process_events(dispc_t *disp)
         debug_trace("scrap");
       }
 
+      if (key_cnt == sizeof(key_buf))
+      {
+        key_cnt = 0;
+        debug_trace("overflow");
+      }
+
       /* Add character to the key sequence */
       key_buf[key_cnt++] = c;
       key_buf[key_cnt] = '\0';  /* make key_buf to be assciiz */
@@ -956,8 +962,8 @@ static int s_disp_init(dispc_t *disp)
          (raw() != ERR)  /* no interrupt, quist, suspend and flow control */
       && (noecho() != ERR)  /* no auto echo */
       && (nonl() != ERR)  /* don't wait for new line to process keys */
-      && (nodelay(stdscr, TRUE) != ERR)
-      && (intrflush(stdscr, FALSE) != ERR)
+      && (nodelay(stdscr, TRUE) != ERR) /* getch() doesn't wait for keys */
+      && (intrflush(stdscr, FALSE) != ERR)  /* ctrl+break doesn't flush */
      ))
   {
     disp->code = DISP_NCURSES_MODE_SETUP_FAILURE;
@@ -1000,8 +1006,6 @@ static void s_disp_set_cursor_pos(dispc_t *disp, int x, int y)
   int r;
 
   r = move(y, x);
-  ASSERT(r != ERR);
-  r = refresh();
   ASSERT(r != ERR);
 }
 
