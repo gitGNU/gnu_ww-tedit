@@ -17,7 +17,11 @@ SET (CMAKE_BUILD_TYPE "Debug")
 ENDIF (CMAKE_BUILD_TYPE STREQUAL "")
 
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+IF (UNIX)
+  set(dbg_def "-D _DEBUG -g")
+ELSE (UNIX)
   set(dbg_def "-D _DEBUG")
+ENDIF (UNIX)
 ELSE (CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(dbg_def)
 ENDIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -36,9 +40,11 @@ ENDIF (MY_WIN32 AND EXISTS src/dbghelp/dbghelp.h)
 IF (UNIX)
 SET(disp_platform_def "-D DISP_NCURSES")
 SET(disp_lib_src src/disp/ncurs_disp.c)
+SET(dirent_src)
 ELSE (UNIX)
 SET(disp_platform_def "-D DISP_WIN32_GUIEMU")
 SET(disp_lib_src src/disp/win_g_disp.c)
+SET(dirent_src src/dirent.c)
 ENDIF (UNIX)
 
 # assert_sc is only implemented for WIN32 platform
@@ -77,7 +83,7 @@ SET(ww_main_src src/assertsc.c
                 src/debug.c
                 src/defs.c
                 src/diag.c
-                src/dirent.c
+                ${dirent_src}
                 src/doctype.c
                 src/edinterf.c
                 src/edit.c
