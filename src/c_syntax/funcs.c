@@ -1487,6 +1487,120 @@ _exit:
 }
 
 /*
+on exit:
+returns indent of line, -1 line is empty (len=0 or only spaces)
+stTextContext.nPos/CurChar point to first non-blank of the line
+*/
+static int find_line_indent(TGetCharContext *pstTextContext, int line)
+{
+  TEditInterf *pEditInterf;
+  int indent;
+
+  pEditInterf = pstTextContext->pEditInterf;
+
+  if (!set_pos(pstTextContext, line, 0))  /* From pos 0 of cur line */
+    return -1;
+  get_char(pstTextContext);
+
+  if (pstTextContext->nCurLineLen == 0)
+    return -1;
+
+  if (!is_blank(pstTextContext->CurChar))
+    return 0;
+  else
+  {
+    while (is_blank(pstTextContext->CurChar))
+    {
+      indent = pstTextContext->nPos;
+      /* Adjust for any tab characters */
+      indent = pEditInterf->pfnGetTabPos(indent, line, pEditInterf);
+      if (!goto_next_char(pstTextContext))
+        return -1;
+      get_char(pstTextContext);
+    }
+    return indent + 1;
+  }
+}
+
+/*
+searches for the first indent above a line
+indent must be !=0, and different than current line indent
+*/
+static int find_indent_upward(TGetCharContext *pstTextContext,
+                              TEditInterf *pEditInterf,
+                              int line)
+{
+  int indent;
+  int cur_line_indent;
+
+  if (!set_pos(pstTextContext, line, 0))  /* From pos 0 of cur line */
+    return -1;
+  get_char(pstTextContext);
+
+  cur_line_indent = pstTextContext->nPos;
+  /* Adjust for any tab characters */
+  cur_line_indent = pEditInterf->pfnGetTabPos(cur_line_indent, line, pEditInterf);
+
+  for (; line >= 0; --line)
+  {
+    indent = find_line_indent(pstTextContext, line);
+
+    if (indent == -1)
+      continue;
+    if (indent == 0)
+      continue;
+    if (indent == cur_line_indent)
+      continue;
+
+    return indent;
+  }
+
+  return -1;
+}
+
+/*
+searches for the first indent below a line
+indent must be !=0, and different than current line indent
+*/
+static int find_indent_downward(TGetCharContext *pstTextContext)
+{
+  int indent;
+  int line;
+
+  line = pstTextContext->nLine + 1;
+
+  for (;; ++line)
+  {
+    indent = find_line_indent(pstTextContext, line);
+
+    if (indent == -1)
+      continue;
+
+    return indent;
+  }
+
+  return -1;
+}
+
+/*
+Searches backward to find the beginning of a block with '{' at
+bracket 0
+*/
+static int find_bracket_level0(TGetCharContext *pstTextContext)
+{
+  while (find_opening_bracket(pstTextContext))
+  {
+    /* check bracket level at the start of the line */
+    if (!set_pos(pstTextContext, pstTextContext->nLine, 0))
+      return 0;
+    get_char(pstTextContext);
+    if (pstTextContext->nPrevLineBracketLevel == 0)
+      return 1;
+  }
+  return 0;
+}
+
+/*
 ---c_lang_calc_indent
 This function calculates the desired indentation at a line position.
 Returns -1 if no suitable indent is calculated.
@@ -1503,6 +1617,10 @@ int c_lang_calc_indent(TEditInterf *pEditInterf)
   int nIndent;
   int nCurBracketLevel;
   int nOffsetUnit;
+  int line;
+  int new_indent;
+  int block_start_indent;
+  int open_bracket_line;
 
   nIndent = -1;  /* Assume no good indent */
 
@@ -1516,42 +1634,37 @@ int c_lang_calc_indent(TEditInterf *pEditInterf)
   if (nPos != 0)  /* User doesn't intend autoindent? */
     return -1;
 
-  /* Scan for the first non-blank */
-_start_line:
-  if (!set_pos(&stTextContext, nRow, 0))  /* From pos 0 of cur line */
-    goto _exit;
-  get_char(&stTextContext);
+  nIndent = find_line_indent(&stTextContext, nRow);
 
-  while (1)
-  {
-    if (!is_blank(stTextContext.CurChar))
-    {
-      nIndent = stTextContext.nPos;
-      /* Adjust for any tab characters */
-      nIndent = pEditInterf->pfnGetTabPos(nIndent, nRow, pEditInterf);
-      if (stTextContext.CurChar == '}')
-      {
-        nCurBracketLevel = calc_bracket_level(&stTextContext);
-        nOffsetUnit = 0;
-        if (nCurBracketLevel != 0)
-          nOffsetUnit = nIndent / nCurBracketLevel;
-        nIndent = nIndent + nOffsetUnit;
-      }
-      goto _exit;
-    }
-    /* move a char forward */
-    if (!goto_next_char(&stTextContext))
-    {
-      ++nRow;
-      goto _start_line;
-    }
-    get_char(&stTextContext);
-  }
-_exit:
-  if (nIndent == 0)
-    return heuristic_indent_calc(&stTextContext);
-  else
+  /* if we are at a line with some text, paste at the same indent */
+  if (nIndent != -1 && stTextContext.CurChar != '}')
     return nIndent;
+
+  /* Detect the indent of the current block */
+  if (!find_opening_bracket(&stTextContext))
+    return -1;
+
+  open_bracket_line = stTextContext.nLine;
+  new_indent = find_indent_downward(&stTextContext);
+  if (new_indent != -1)
+  {
+    /* check for empty {} */
+    if (   stTextContext.CurChar == '}'
+        && open_bracket_line == stTextContext.nLine - 1)
+    {
+      if (!set_pos(&stTextContext, open_bracket_line - 1, 0))  /* From pos 0 of cur line */
+        return -1;
+      get_char(&stTextContext);
+      block_start_indent = new_indent;
+      if (find_bracket_level0(&stTextContext))  /* try upmost or previous block */
+      {
+        new_indent = find_indent_downward(&stTextContext);
+        if (new_indent != -1)
+          new_indent += block_start_indent;
+      }
+    }
+  }
+  return new_indent;
 }
 
 /*

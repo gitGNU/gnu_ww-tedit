@@ -737,25 +737,6 @@ static int s_disp_wait_console(int *elapsed_time)
 }
 
 /*!
-@brief Checks if there are more pending characters on the stdin
-
-Waits with no timout.
-
-@return 0 -- no characters waiting
-@return 1 -- at least one character waiting
-*/
-static int s_disp_character_is_waiting(void)
-{
-  fd_set rset;
-  int num_files_ready;
-
-  FD_ZERO(&rset);
-  FD_SET(fileno(stdin), &rset);
-
-  return select(fileno(stdin) + 1, &rset, NULL, NULL, NULL) > 0;
-}
-
-/*!
 @brief matches key sequence against the table of key sequences
 
 @param key_buf     key sequence in asciiz format
