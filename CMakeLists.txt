@@ -57,7 +57,7 @@ ENDIF (MY_WIN32)
 SET(disp_lib_include src/disp)
 SET_SOURCE_FILES_PROPERTIES(${disp_lib_src}
                             PROPERTIES
-                            COMPILE_FLAGS "${assert_sc_def} ${dbg_def}")
+                            COMPILE_FLAGS "${assert_sc_def} ${dbg_def} -Wall")
 
 SET(perl_re_lib_src src/perl_re/get.c
                     src/perl_re/maketables.c
@@ -144,7 +144,7 @@ SET(ww_main_src src/assertsc.c
 
 SET_SOURCE_FILES_PROPERTIES(${ww_main_src}
                             PROPERTIES COMPILE_FLAGS
-                            "-D HEAP_DBG=1 ${dbg_def} ${disp_platform_def} ${dbghelp_def}")
+                            "-Wall -D HEAP_DBG=1 ${dbg_def} ${disp_platform_def} ${dbghelp_def}")
 
 SET(ww_src ${disp_lib_src} ${perl_re_lib_src} ${ww_main_src})
 

@@ -1586,30 +1586,77 @@ static int find_indent_downward(TGetCharContext *pstTextContext)
 Searches backward to find the beginning of a block with '{' at
 bracket 0
 */
-static int find_bracket_level0(TGetCharContext *pstTextContext)
+static int find_prev_block_level0(TGetCharContext *pstTextContext)
 {
+  int r;
+  int save_line;
   int line;
+
+  save_line = pstTextContext->nLine;
 
   /* find end of previous block */
   line = pstTextContext->nLine - 1;
   do
   {
+    if (line < 0)
+    {
+      r = 0;
+      goto _exit;
+    }
     if (!set_pos(pstTextContext, line--, 0))
-      return 0;
+    {
+      r = 0;
+      goto _exit;
+    }
     get_char(pstTextContext);
   }
   while (pstTextContext->nPrevLineBracketLevel == 0);
 
-  while (find_opening_bracket(pstTextContext))
+  if (find_opening_bracket(pstTextContext))
+    r = 1;
+  else
+    r = 0;
+
+_exit:
+  if (!r)
+    if (set_pos(pstTextContext, save_line, 0))
+      get_char(pstTextContext);
+
+  return r;
+}
+
+/*
+Searches forward to find the beginning of a block with '{' at
+bracket 0
+*/
+static int find_next_block_level0(TGetCharContext *pstTextContext)
+{
+  int r;
+  int save_line;
+  int line;
+
+  save_line = pstTextContext->nLine;
+
+  /* find beginning of next block */
+  line = pstTextContext->nLine + 1;
+  do
   {
-    /* check bracket level at the start of the line */
-    if (!set_pos(pstTextContext, pstTextContext->nLine, 0))
-      return 0;
+    if (!set_pos(pstTextContext, line++, 0))
+    {
+      r = 0;
+      goto _exit;
+    }
     get_char(pstTextContext);
-    if (pstTextContext->nPrevLineBracketLevel == 0)
-      return 1;
   }
-  return 0;
+  while (pstTextContext->nPrevLineBracketLevel == 0);
+  r = 1;
+
+_exit:
+  if (!r)
+    if (set_pos(pstTextContext, save_line, 0))
+      get_char(pstTextContext);
+
+  return r;
 }
 
 /*
@@ -1658,24 +1705,29 @@ int c_lang_calc_indent(TEditInterf *pEditInterf)
 
   open_bracket_line = stTextContext.nLine;
   new_indent = find_indent_downward(&stTextContext);
-  if (new_indent != -1)
+  if (   new_indent != -1
+      && stTextContext.CurChar == '}'  /* check for empty {} */
+      && open_bracket_line == stTextContext.nLine - 1)
   {
-    /* check for empty {} */
-    if (   stTextContext.CurChar == '}'
-        && open_bracket_line == stTextContext.nLine - 1)
+    if (!set_pos(&stTextContext, open_bracket_line - 1, 0))  /* From pos 0 of cur line */
+      return -1;
+    get_char(&stTextContext);
+    block_start_indent = new_indent;
+    if (!find_prev_block_level0(&stTextContext))
     {
-      if (!set_pos(&stTextContext, open_bracket_line - 1, 0))  /* From pos 0 of cur line */
+      if (!set_pos(&stTextContext, open_bracket_line, 0))
         return -1;
       get_char(&stTextContext);
-      block_start_indent = new_indent;
-      if (find_bracket_level0(&stTextContext))  /* try previous block */
-      {
-        new_indent = find_indent_downward(&stTextContext);
-        if (new_indent != -1)
-          new_indent += block_start_indent;
-      }
+      if (!find_closing_bracket(&stTextContext))
+        return -1;
+      if (!find_next_block_level0(&stTextContext))
+        return -1;
     }
+    new_indent = find_indent_downward(&stTextContext);
+    if (new_indent != -1)
+      new_indent += block_start_indent;
   }
+
   return new_indent;
 }
 

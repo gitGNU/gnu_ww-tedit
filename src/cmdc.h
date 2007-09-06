@@ -33,11 +33,11 @@ typedef struct cmdc cmdc_t;
 #endif
 
 #define _CMDC_PFILE(cmdc) \
-  (VALID_CMDC(cmdc), (TFile*)(cmdc)->param1)
+  (VALID_CMDC(cmdc) ? (TFile*)(cmdc)->param1 : 0)
 #define CMDC_PFILE(cmdc) _CMDC_PFILE((cmdc_t *)cmdc)
 
 #define _CMDC_WRKSPACE(cmdc) \
-  (VALID_CMDC(cmdc), (wrkspace_data_t *)(cmdc)->wrkspace)
+  (VALID_CMDC(cmdc) ? (wrkspace_data_t *)(cmdc)->wrkspace : 0)
 #define CMDC_WRKSPACE(cmdc) _CMDC_WRKSPACE((cmdc_t *)cmdc)
 
 #ifdef _DEBUG
