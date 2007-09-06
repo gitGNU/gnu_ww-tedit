@@ -1588,6 +1588,18 @@ bracket 0
 */
 static int find_bracket_level0(TGetCharContext *pstTextContext)
 {
+  int line;
+
+  /* find end of previous block */
+  line = pstTextContext->nLine - 1;
+  do
+  {
+    if (!set_pos(pstTextContext, line--, 0))
+      return 0;
+    get_char(pstTextContext);
+  }
+  while (pstTextContext->nPrevLineBracketLevel == 0);
+
   while (find_opening_bracket(pstTextContext))
   {
     /* check bracket level at the start of the line */
@@ -1656,7 +1668,7 @@ int c_lang_calc_indent(TEditInterf *pEditInterf)
         return -1;
       get_char(&stTextContext);
       block_start_indent = new_indent;
-      if (find_bracket_level0(&stTextContext))  /* try upmost or previous block */
+      if (find_bracket_level0(&stTextContext))  /* try previous block */
       {
         new_indent = find_indent_downward(&stTextContext);
         if (new_indent != -1)

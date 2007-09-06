@@ -3,9 +3,17 @@ memory and disk requirements, syntax highlighting, multiple simultaneous file
 editing, and more. It can be compiled for Linux / Unix (text console), and
 GUI emulated console for X and MS Windows.
 
+====== CONTENTS
+Build for Windows
+Build for Linux
+Doxygen
+Tips for using WW on a text terminal
+NEWS
+TODO
 
-====== Build for Windows
 
+Build for Windows
+-----------------
 Open a cmd.exe prompt. To setup the command line envyronment, execute
 vcvars32.bat from msdev\bin.
 
@@ -17,8 +25,8 @@ so that the source is in ../src. From there execute
 This creates makefile for nmake. To build after that, only type `nmake'.
 
 
-====== Build for Linux
-
+Build for Linux
+---------------
 Create directoriy for the debug binaries, ww_ncurs_dbg. Make it current
 so that the source is in ../src. From there execute
 
@@ -27,8 +35,8 @@ so that the source is in ../src. From there execute
 This creates makefile for GNU make. To build after that, only type `make'.
 
 
-====== Doxygen
-
+Doxygen
+-------
 `Doxyfile' is the configuration for Doxygen. Inside 'Doxyfile' search for
 `# *' to find all marked comment sections of the options that were changed
 from the default.
@@ -41,11 +49,9 @@ a subdirectory of the current directory, execute:
 API documentation of the modules is generated in doxy/html.
 
 
-====== Prepare ChangeLog:
-cvs2cl.pl --fsf
-
-
-====== Tips for using WW in a text terminal
+Tips for using WW in a text terminal
+------------------------------------
+(old)
 
 There are different levels of limitations depending on the terminal emulation
 The best terminal emulation is xterm, it transmits most of the useful key
@@ -62,7 +68,91 @@ combinations. Every other terminal is with varying degree of limitations.
    then use `Ctrl+k,n'
 -- To indent blocks use Tab as usual, to unindent use Ctrl+k-u
 
-Build deps on linux
---x11: xlibs-dev, libxft-dev
---text: ncurses-dev
+
+NEWS for last 3 builds
+----------------------
+--- version 0.2.3 build TO BE 51 ---
++ using git for version control
++ new disp module, new API, reimplemented from scratch
++ start to use doxygen for code documentation
++ new keybindings for text terminals, improved ergonomics
++ (on a branch) using scons for building and cross building
++ (on a branch) deb package
+
+--- version 0.2.3 build 50 --- [ 2006-02-14 ]
+. [bug #15293] option UseTabs has no effect when turned off
+. X GUI: window didn't show correct title
++ resize in X11 version, maximize, restore
+. [bug #15192] wglob.ini always created in the current directory
+
+--- version 0.2.3 build 49 --- [ 2006-01-01 ]
+. [bug #11337] Win32 GUI: window is resizable
++ resize in Win32 GUI
+. [bug #14871] Makefile: the build fails mysteriously if output
+  directories don't exist
+. [bug #14870] Makefile: the X and console versions have the same
+  name & directory
+. [bug #14869] The X version cannot be compiled with static libraries
+
+--- version 0.2.3 build 48 --- [ 2005-10-25 ]
+. [bug #13445] Linux/X: Reverse quote doesn't work
++ free type fonts (xft) in X
+. [bug #13250] Clipboard doesn't work in X
+. [bug #12067] fix tab/shift+tab in linux text console and
+  other key bindings
+. [bug #12743] console version read_kbd craps out in the middle
+  of ESC-seq
+. [bug #13484] search with options (-i, -b) doesn't work
+. [bug #13489] search beyond last occurence fails
+. [bug #13491] search with "-b" must jump on the previous if current
+  pos matches
+. [bug #13508] on solaris xterm, backspace is unrecognized]
+. [bug #13517] another failing search
++ imroved kaydefs for xterm
+. [bug #12309] mark-to-end-of-word is incorrect
+. [bug #12311] CheckDocumentTypeSet() fails when plug-in activated
+. [bug #12196] user bookmarks navigations doesn't work
++ stricter heap validation on Windows
+. {crash} saving bookmarks to .ini file fails
+. [bug #12275] {crash} two copys of a file in memory and bookmarks
+. [bug #12745] when wglob.ini is edited, don't store global cfg
+
+
+TODO
+----
+* remove NEWS, ChangeLog and TODO files
+
+SHORT-TERM:
+* handle resize signal for ncurses
+* remove most of VALIDATE_HEAP_PTR and VALIDATE_HEAP, which were put temporarely
+* highlight pairs of () and []
+* ctrl+] : goto matching pair
+* ctrl+[ : goto to the { or current level - 1
+* Indent/Unindent block should work even if block is hidden
+* in X Read fron from the .ini, like in the Windows GUI
+* in gui_scr and x_scr and elsewhere fix the buf[255] to be bigger/smarter!
+* ini2.c, when writing .ini files, check that no section is written
+  if no changes were made on any of the options; this is necessary to permit
+  for more than one editor to store .ini files on exit
+* when resizing the screen make the file status line show the width and
+  the height of the file area, the format should be WxH instead of
+  row:col
+* prepare native palette for text console in putty, redo the way palettes
+  are maintained to permit italics and bolds for comments and highlights
+* add the thwrap multithread library
+* refactor display and keyboard into separate module (library)
+* EVENT_KEY is too big, move out from HandleFileViewEvents (fview.c)
+* establish min size (use MSG_SET_MIN_SIZE)
+
+IDEAS:
+* in the .ini file add section to permit the adding of
+  new ESC sequences
+* Pressing <End> twice will show the current func name tooltip if not
+  currently visible on the screen
+* Think of highlighting TABS
+* Think of highlighting SPACES at the end of the lines
+* make ctrl+kz -- suspend (unix suspend), this when suspend is implemented
+* ini2.c -- merge histories of files and ed lines based on a time stamp,
+  this will permit that upon exit multiple editor instances would not
+  overwrite eachothers data blindly
 
