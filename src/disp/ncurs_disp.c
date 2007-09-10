@@ -28,6 +28,8 @@ prototype of assert.
 */
 
 #include <stdio.h>
+#include <strings.h>
+#include <stdlib.h>
 #include <malloc.h>
 #include <curses.h>
 #include <sys/time.h>
@@ -213,9 +215,9 @@ static void s_disp_show_cursor(dispc_t *disp, int caret_is_visible)
 #define KEY_TRACE1 debug_trace
 #define KEY_TRACE2 debug_trace
 #else
-#define KEY_TRACE0 (void)
-#define KEY_TRACE1 (void)
-#define KEY_TRACE2 (void)
+#define KEY_TRACE0(a)
+#define KEY_TRACE1(a, b)
+#define KEY_TRACE2(a, b, c)
 #endif
 
 typedef struct key_sequence
@@ -648,7 +650,7 @@ static void s_disp_get_ncurses_keys(dispc_t *disp)
      s = tigetstr(s_keys[i].term_esc_seq);
      if ((int)s != -1 && (int)s != 0)
      {
-       //#if 0
+       #if 0
        char key_name_buf[128];
        char *c;
 
@@ -658,9 +660,12 @@ static void s_disp_get_ncurses_keys(dispc_t *disp)
                          sizeof(key_name_buf));
        KEY_TRACE1("%s: ", key_name_buf);
        while (*c != '\0')
-         KEY_TRACE1("%x ", *c++);
+       {
+         KEY_TRACE1("%x ", *c);
+         ++c;
+       }
        KEY_TRACE0("\n");
-       //#endif
+       #endif
 
        /* override the manually coded sequence with what terminal capabilities
        returned */
@@ -760,7 +765,7 @@ static int s_match_key_sequence(char *key_buf,
     {
       if (strlen(s_keys[i].esq_seq) == key_buf_len)  /* complete match? */
       {
-        debug_trace("[match] ", key_buf);
+        /*debug_trace("[match] ", key_buf);*/
         *shift_state = s_disp_get_console_shift_state();
         *key = s_keys[i].key | (*shift_state << 16);
         return 2;
@@ -815,7 +820,7 @@ static int s_disp_process_events(dispc_t *disp)
         disp_event_clear(&ev);
         ev.t.code = EVENT_TIMER_5SEC;
         s_disp_ev_q_put(disp, &ev);
-        debug_trace("event-timer-5sec\n");
+        /*debug_trace("event-timer-5sec\n");*/
         return 1;
       }
 

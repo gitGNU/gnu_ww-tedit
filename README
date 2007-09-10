@@ -3,79 +3,24 @@ memory and disk requirements, syntax highlighting, multiple simultaneous file
 editing, and more. It can be compiled for Linux / Unix (text console), and
 GUI emulated console for X and MS Windows.
 
-====== CONTENTS
-Build for Windows
-Build for Linux
-Doxygen
-Tips for using WW on a text terminal
+...CONTENTS...
 NEWS
+How to build for Windows
+How to build for Linux
+How to build Doxygen documentation
+Tips for using WW on a text terminal
 TODO
-
-
-Build for Windows
------------------
-Open a cmd.exe prompt. To setup the command line envyronment, execute
-vcvars32.bat from msdev\bin.
-
-Create directoriy for the debug binaries, ww_guiemu_dbg. Make it current
-so that the source is in ../src. From there execute
-
-`cmake -G "NMake Makefiles" ..'
-
-This creates makefile for nmake. To build after that, only type `nmake'.
-
-
-Build for Linux
----------------
-Create directoriy for the debug binaries, ww_ncurs_dbg. Make it current
-so that the source is in ../src. From there execute
-
-`cmake -G  "Unix Makefiles" ..'
-
-This creates makefile for GNU make. To build after that, only type `make'.
-
-
-Doxygen
--------
-`Doxyfile' is the configuration for Doxygen. Inside 'Doxyfile' search for
-`# *' to find all marked comment sections of the options that were changed
-from the default.
-
-To generate the documentation from within the top directory, so that src is
-a subdirectory of the current directory, execute:
-
-`doxygen'
-
-API documentation of the modules is generated in doxy/html.
-
-
-Tips for using WW in a text terminal
-------------------------------------
-(old)
-
-There are different levels of limitations depending on the terminal emulation
-The best terminal emulation is xterm, it transmits most of the useful key
-combinations. Every other terminal is with varying degree of limitations.
-
--- If Alt combinations doesn't work, use ESC to invoke menu, then
-   two or three shortcut letter. For example search function is `Esc,s,u'
--- Ctrl+tab doesn't work, use Ctrl+F6 to switch between the top two files
--- To switch among other files use atl+0 or Alt+W
--- If ctrl+F6 doesn't work, use the equivalent `Alt+W,2'
--- Shift+arrors must work in xterm, if it doesn't then use F8
--- `Ctrl+K,b', `Ctrl+k,k' also works for selections
--- Ctrl+Shift+F8 must work to switch to column blocks, if it doesn't
-   then use `Ctrl+k,n'
--- To indent blocks use Tab as usual, to unindent use Ctrl+k-u
+..............
 
 
 NEWS for last 3 builds
 ----------------------
 --- version 0.2.3 build TO BE 51 ---
 + using git for version control
-+ new disp module, new API, reimplemented from scratch
-+ start to use doxygen for code documentation
++ new disp module, new API, completely reimplemented
++ se doxygen for code documentation
 + new keybindings for text terminals, improved ergonomics
+. [bug #11532] bad autoindent
 + (on a branch) using scons for building and cross building
 + (on a branch) deb package
 
@@ -118,9 +63,90 @@ NEWS for last 3 builds
 . [bug #12745] when wglob.ini is edited, don't store global cfg
 
 
+How to build for Windows
+------------------------
+Open a cmd.exe prompt. To setup the command line envyronment, execute
+vcvars32.bat from msdev\bin.
+
+Create directoriy for the debug binaries, ww_guiemu_dbg. Make it current
+so that the source is in ../src. From there execute
+
+`cmake -G "NMake Makefiles" ..'
+
+This creates makefile for nmake. To build after that, only type `nmake'.
+
+
+How to build for Linux
+----------------------
+Create directoriy for the debug binaries, ww_ncurs_dbg. Make it current
+so that the source is in ../src. From there execute
+
+`cmake -G  "Unix Makefiles" ..'
+
+This creates makefile for GNU make. To build after that, only type `make'.
+
+
+How to build Doxygen documentation
+----------------------------------
+`Doxyfile' is the configuration for Doxygen. Inside 'Doxyfile' search for
+`# *' to find all marked comment sections of the options that were changed
+from the default.
+
+To generate the documentation from within the top directory, so that src is
+a subdirectory of the current directory, execute:
+
+`doxygen'
+
+API documentation of the modules is generated in doxy/html.
+
+
+Tips for using WW in a text terminal
+------------------------------------
+When running WW in a text terminal most of the CUI key combinations are not
+working. For example the arrow keys work but for shift+arrow combination the
+terminal is usually not emitting any distinctive key sequence making many
+editor functions unaccessible. To invoke those unreachable functions
+on such terminals a new alternative set of key bindings was put together.
+
+Frequently used editor functions are assigned to 'ctrl' combinations.
+
+ctrl+e -- enters text selection mode. Use arrow keys, or any other navigation
+function to specify the range of selected text. After that any block
+manipulation operation will use the current selection and will also
+end the mode. For example, to copy text, start with ctrl+e,
+use arrows to select, and to copy press ctrl+c, this will put the text in the
+clipboard and at the same time end the selection mode.
+
+ctrl+l -- find next. This is F3 but this key doesn't work on many terminals.
+ctrl+d, l -- find next searching backward. Same as Shift+F3.
+
+NEEDS MORE WORK!
+
+Many of the 'shift' key combinations are replaced by key sequences starting
+with ctrl+d.
+
+Incremental search is ctrl+i. In the alternative set it is ctrl+d, i
+
+(old)
+
+There are different levels of limitations depending on the terminal emulation
+The best terminal emulation is xterm, it transmits most of the useful key
+combinations. Every other terminal is with varying degree of limitations.
+
+-- If Alt combinations doesn't work, use ESC to invoke menu, then
+   two or three shortcut letter. For example search function is `Esc,s,u'
+-- Ctrl+tab doesn't work, use Ctrl+F6 to switch between the top two files
+-- To switch among other files use atl+0 or Alt+W
+-- If ctrl+F6 doesn't work, use the equivalent `Alt+W,2'
+-- Shift+arrors must work in xterm, if it doesn't then use F8
+-- `Ctrl+K,b', `Ctrl+k,k' also works for selections
+-- Ctrl+Shift+F8 must work to switch to column blocks, if it doesn't
+   then use `Ctrl+k,n'
+-- To indent blocks use Tab as usual, to unindent use Ctrl+k-u
+
+
 TODO
 ----
-* remove NEWS, ChangeLog and TODO files
 
 SHORT-TERM:
 * handle resize signal for ncurses

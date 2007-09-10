@@ -1397,96 +1397,6 @@ _exit:
 #define MAX_CALC_INDENT 12
 
 /*
----heuristic_indent_calc
-*/
-static int heuristic_indent_calc(TGetCharContext *pstTextContext)
-{
-  int nCurBracketLevel;
-  int nRow;
-  int nIndent;
-  int nOffsetUnit;
-  TEditInterf *pEditInterf;
-  static int Indents[MAX_CALC_INDENT];
-  int nNumNonZeroIndents;
-  int i;
-  int nMax;
-  int nMaxIndex;
-
-  pEditInterf = pstTextContext->pEditInterf;
-  memset(Indents, 0, sizeof(Indents));
-
-  if (!set_pos(pstTextContext, 0, 0))  /* From pos 0 of cur line */
-    goto _exit;
-  get_char(pstTextContext);
-  nRow = 0;
-  nNumNonZeroIndents = 0;
-
-  while (1)
-  {
-    nCurBracketLevel = calc_bracket_level(pstTextContext);
-    if (nCurBracketLevel == 0)  /* Skip the lines between two {} {} */
-    {
-_next_line:
-      if (nNumNonZeroIndents == 100)
-        goto _exit;
-      ++nRow;
-      if (!set_pos(pstTextContext, nRow, 0))  /* From pos 0 of cur line */
-        goto _exit;
-      get_char(pstTextContext);
-      continue;
-    }
-    else
-    {
-      while (is_blank(pstTextContext->CurChar))
-      {
-        /* move a char forward */
-        if (!goto_next_char(pstTextContext))
-          goto _next_line;
-        get_char(pstTextContext);
-      }
-      nIndent = pstTextContext->nPos;
-      /* Adjust for any tab characters */
-      nIndent = pEditInterf->pfnGetTabPos(nIndent, nRow, pEditInterf);
-      if (pstTextContext->CurChar == '{')
-      {
-        nCurBracketLevel = calc_bracket_level(pstTextContext);
-        nOffsetUnit = 0;
-        if (nCurBracketLevel != 0)
-          nOffsetUnit = nIndent / nCurBracketLevel;
-        nIndent = nOffsetUnit;
-      }
-      else
-        if (nCurBracketLevel > 1)
-          goto _next_line;
-
-      /*
-      Register the indent (update the num of indents of this kind)
-      */
-      if (nIndent > 0 && nIndent < 12)
-      {
-        ++nNumNonZeroIndents;
-        ++Indents[nIndent];
-      }
-      goto _next_line;
-    }
-  }
-
-_exit:
-  /* Find the kind of indent of which we had counted most */
-  nMax = 0;
-  nMaxIndex = 0;
-  for (i = 0; i < MAX_CALC_INDENT; ++i)
-  {
-    if (Indents[i] > nMax)
-    {
-      nMax = Indents[i];
-      nMaxIndex = i;
-    }
-  }
-  return nMaxIndex;
-}
-
-/*
 on exit:
 returns indent of line, -1 line is empty (len=0 or only spaces)
 stTextContext.nPos/CurChar point to first non-blank of the line
@@ -1520,42 +1430,6 @@ static int find_line_indent(TGetCharContext *pstTextContext, int line)
     }
     return indent + 1;
   }
-}
-
-/*
-searches for the first indent above a line
-indent must be !=0, and different than current line indent
-*/
-static int find_indent_upward(TGetCharContext *pstTextContext,
-                              TEditInterf *pEditInterf,
-                              int line)
-{
-  int indent;
-  int cur_line_indent;
-
-  if (!set_pos(pstTextContext, line, 0))  /* From pos 0 of cur line */
-    return -1;
-  get_char(pstTextContext);
-
-  cur_line_indent = pstTextContext->nPos;
-  /* Adjust for any tab characters */
-  cur_line_indent = pEditInterf->pfnGetTabPos(cur_line_indent, line, pEditInterf);
-
-  for (; line >= 0; --line)
-  {
-    indent = find_line_indent(pstTextContext, line);
-
-    if (indent == -1)
-      continue;
-    if (indent == 0)
-      continue;
-    if (indent == cur_line_indent)
-      continue;
-
-    return indent;
-  }
-
-  return -1;
 }
 
 /*
@@ -1674,9 +1548,6 @@ int c_lang_calc_indent(TEditInterf *pEditInterf)
   int nNumLines;
   TGetCharContext stTextContext;
   int nIndent;
-  int nCurBracketLevel;
-  int nOffsetUnit;
-  int line;
   int new_indent;
   int block_start_indent;
   int open_bracket_line;

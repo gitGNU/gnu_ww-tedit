@@ -174,6 +174,8 @@ int disp_init(const disp_wnd_param_t *wnd_param, void *disp_obj)
   disp->string_id = disp_id;
   #endif
 
+  s_disp_ev_q_init(disp);
+
   disp_wnd_set_param(disp, wnd_param);
   disp->paint_is_suspended = 1;
   r = s_disp_init(disp);

@@ -13,7 +13,7 @@ ENDIF (CYGWIN)
 
 # Debug build by default
 IF (CMAKE_BUILD_TYPE STREQUAL "")
-SET (CMAKE_BUILD_TYPE "Debug")
+  SET(CMAKE_BUILD_TYPE "Debug")
 ENDIF (CMAKE_BUILD_TYPE STREQUAL "")
 
 IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -25,6 +25,12 @@ ENDIF (UNIX)
 ELSE (CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(dbg_def)
 ENDIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+IF (UNIX)
+  set(warn_def "-Wall")
+ELSE (UNIX)
+  set(warn_def "-W4")
+ENDIF (UNIX)
 
 # WIN32: use dbghelp library if installed in src/dbghelp
 IF (MY_WIN32 AND EXISTS src/dbghelp/dbghelp.h)
@@ -57,7 +63,7 @@ ENDIF (MY_WIN32)
 SET(disp_lib_include src/disp)
 SET_SOURCE_FILES_PROPERTIES(${disp_lib_src}
                             PROPERTIES
-                            COMPILE_FLAGS "${assert_sc_def} ${dbg_def} -Wall")
+                            COMPILE_FLAGS "${assert_sc_def} ${dbg_def} ${warn_def}")
 
 SET(perl_re_lib_src src/perl_re/get.c
                     src/perl_re/maketables.c
@@ -144,7 +150,7 @@ SET(ww_main_src src/assertsc.c
 
 SET_SOURCE_FILES_PROPERTIES(${ww_main_src}
                             PROPERTIES COMPILE_FLAGS
-                            "-Wall -D HEAP_DBG=1 ${dbg_def} ${disp_platform_def} ${dbghelp_def}")
+                            "-D HEAP_DBG=1 ${dbg_def} ${disp_platform_def} ${dbghelp_def} ${warn_def}")
 
 SET(ww_src ${disp_lib_src} ${perl_re_lib_src} ${ww_main_src})
 
