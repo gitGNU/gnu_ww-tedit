@@ -198,7 +198,7 @@ enum key_defs
   kbNumLock, kbScrLock, kbHome, kbUp,
   kbPgUp, kbGrayMinus, kbLeft, kbPad5, kbRight,
   kbGrayPlus, kbEnd, kbDown, kbPgDn, kbIns, kbDel,
-  kbF11=87, kbF12=88,
+  kbF11=87, kbF12=88, kbTilda,
 };
 
 enum event_type

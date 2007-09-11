@@ -235,6 +235,8 @@ or sequence of symbols. We need to convert those characters into
 a Ctrl/Shift/Alt key combination */
 static key_sequence_t s_keys[] =
 {
+  {"~",         KEY(0,       kbTilda) | '~'},
+  {"`",         KEY(kbShift, kbTilda) | '`'},
   {"1",         KEY(0,       kb1) | '1'},
   {"!",         KEY(kbShift, kb1) | '!'},
   {"\0331",     KEY(kbAlt,   kb1)},
