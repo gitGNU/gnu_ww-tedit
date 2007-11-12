@@ -3,14 +3,14 @@ memory and disk requirements, syntax highlighting, multiple simultaneous file
 editing, and more. It can be compiled for Linux / Unix (text console), and
 GUI emulated console for X and MS Windows.
 
-...CONTENTS...
-NEWS
-How to build for Windows
-How to build for Linux
-How to build Doxygen documentation
-Tips for using WW on a text terminal
-TODO
-..............
+CONTENTS
+--------
+* NEWS
+* How to build for Windows
+* How to build for Linux
+* How to build Doxygen documentation
+* Tips for using WW on a text terminal
+* TODO
 
 
 NEWS for last 3 builds
@@ -21,6 +21,8 @@ NEWS for last 3 builds
 + se doxygen for code documentation
 + new keybindings for text terminals, improved ergonomics
 . [bug #11532] bad autoindent
+. [bug #17564] Typo in Edit -> Block menu (Lowecase)
+. [bug #13445] Linux/X: Reverse quote doesn't work
 + (on a branch) using scons for building and cross building
 + (on a branch) deb package
 
@@ -103,31 +105,34 @@ API documentation of the modules is generated in doxy/html.
 Tips for using WW in a text terminal
 ------------------------------------
 When running WW in a text terminal most of the CUI key combinations are not
-working. For example the arrow keys work but for shift+arrow combination the
-terminal is usually not emitting any distinctive key sequence making many
-editor functions unaccessible. To invoke those unreachable functions
-on such terminals a new alternative set of key bindings was put together.
+working. For example, the arrow keys work everywhere but on many terminals the shift+arrow combination doesn't emit any distinctive key sequence rendering many editor functions unaccessible. Alternative set of key bindings can be used to invoke those unreachable functions.
 
 Frequently used editor functions are assigned to 'ctrl' combinations.
 
-ctrl+e -- enters text selection mode. Use arrow keys, or any other navigation
-function to specify the range of selected text. After that any block
+ctrl+e -- enters text selection mode. The current cursor position is marked as one end of the selection and the arrow keys will extend the range by moving the position of the other end.  After that any block
 manipulation operation will use the current selection and will also
 end the mode. For example, to copy text, start with ctrl+e,
 use arrows to select, and to copy press ctrl+c, this will put the text in the
 clipboard and at the same time end the selection mode.
 
-ctrl+l -- find next. This is F3 but this key doesn't work on many terminals.
-ctrl+d, l -- find next searching backward. Same as Shift+F3.
+ctrl+d, e -- toggle column block mode
 
-NEEDS MORE WORK!
+ctrl+l -- find next. A substitute to F3 which doesn't work on some terminals.
+ctrl+d, l -- search backward. Substitute for shift+F3.
+ctrl+d, i -- incremental search mode
 
-Many of the 'shift' key combinations are replaced by key sequences starting
-with ctrl+d.
+ctrl+d, left -- previous word, substitute for ctrl+left-arrow
+ctrl+d, right -- next word, subsitute for ctrl+right-arrow
+ctrl+d, ctrl+left/right also works. This is convenient in to make cursor jump over a few words in the same direction -- the operation can be executed without releasing the `ctrl' key.
 
-Incremental search is ctrl+i. In the alternative set it is ctrl+d, i
+ctrl+d, home -- top of file, substitute for ctrl+home
+ctrl+d, end -- bottom of file, subtitute for ctrl+end
 
-(old)
+ctrl+b, b -- set/remove a bookmark
+ctrl+b, up -- go to previous bookmarks
+ctrl+b, down -- go to next bookmark
+
+(old:TODO:edit:some suggestions are still valid)
 
 There are different levels of limitations depending on the terminal emulation
 The best terminal emulation is xterm, it transmits most of the useful key
@@ -145,9 +150,31 @@ combinations. Every other terminal is with varying degree of limitations.
 -- To indent blocks use Tab as usual, to unindent use Ctrl+k-u
 
 
+How to extend the table of terminal key sequences
+--------------------------------------------------------------------
+The editor has quite complete set of key sequences already. But once in a while
+there is a terminal that emits sequences that are not in the ncurs_disp.c file. New entries can be easilly added to the s_keys[] table.
+
+First the actual sequence must be obtained. There is a convenient script, keys.pl, which can be downloaded from here:
+http://geocities.com/h2428/petar/bash_bind.htm
+
+Press the new keys while the script is running. For example, the discovery of what are the key sequences for `home' and `end' on putty will look like this:
+
+$ ./keys.pl
+press 'x' to exit
+\x1b\x5b\x31\x7e
+\x1b\x5b\x34\x7e
+restore console mode
+
+Now these two lines can be added to s_keys[]:
+{"\x1b\x5b\x31\x7e", KEY(0, kbHome)},
+{"\x1b\x5b\x34\x7e", KEY(0, kbEnd)},
+
+After a rebuild these `home' and `end' will work on putty.
+
+
 TODO
 ----
-
 SHORT-TERM:
 * handle resize signal for ncurses
 * remove most of VALIDATE_HEAP_PTR and VALIDATE_HEAP, which were put temporarely

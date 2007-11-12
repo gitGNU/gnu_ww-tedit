@@ -441,6 +441,11 @@ static key_sequence_t s_keys[] =
   {"\033 ",     KEY(kbAlt,   kbSpace)},
   {"\xa0 ",     KEY(kbAlt,   kbSpace)},
 
+  {"\x1b\x5b\x31\x31\x7e", KEY(0, kbF1)},
+  {"\x1b\x5b\x31\x32\x7e", KEY(0, kbF2)},
+  {"\x1b\x5b\x31\x33\x7e", KEY(0, kbF3)},
+  {"\x1b\x5b\x31\x34\x7e", KEY(0, kbF4)},
+
   {"\033[[A", KEY(0, kbF1), "kf1"},
   {"\033[[B", KEY(0, kbF2), "kf2"},
   {"\033[[C", KEY(0, kbF3), "kf3"},
@@ -454,9 +459,11 @@ static key_sequence_t s_keys[] =
   {"\033\x5b\x32\x33\x7e", KEY(0, kbF11), "kf11"},
   {"\033\x5b\x32\x34\x7e", KEY(0, kbF12), "kf12"},
   {"\033[1~", KEY(0, kbHome), "khome"},
+  {"\x1b\x5b\x31\x7e", KEY(0, kbHome)},  /* putty */
   {"\033[2~", KEY(0, kbIns), "kich1"},
   {"\033[3~", KEY(0, kbDel), "kdch1"},
   {"\033[4~", KEY(0, kbEnd), "kend"},
+  {"\x1b\x5b\x34\x7e", KEY(0, kbEnd)},  /* putty */
   {"\033[5~", KEY(0, kbPgUp), "kpp"},
   {"\033[6~", KEY(0, kbPgDn), "knp"},
   {"\033[M", 0x7f},  /* Macro */
@@ -703,8 +710,8 @@ static unsigned int s_disp_get_console_shift_state(void)
 #endif
 }
 
-#define DISP_SLEEP_TIME 25000  /* Wait for character with timeout 25ms */
-#define DISP_KEY_TIMEOUT 100000  /* 100ms time-out inbetween 2 characters */
+#define DISP_SLEEP_TIME 15000  /* Wait for character with timeout 25ms */
+#define DISP_KEY_TIMEOUT 30000  /* 50ms time-out inbetween 2 characters */
 
 /*!
 @brief Waits for a character on the console with timeout
@@ -831,7 +838,7 @@ static int s_disp_process_events(dispc_t *disp)
         /* check for a single ESC key */
         if (key_cnt == 1 && key_buf[0] == '\x1b')
         {
-           debug_trace("ESC\n");
+           /*debug_trace("ESC\n");*/
            disp_event_clear(&ev);
            ev.t.code = EVENT_KEY;
            ev.e.kbd.scan_code_only = kbEsc;
@@ -853,18 +860,18 @@ static int s_disp_process_events(dispc_t *disp)
     {
       c = getch();
 
-      debug_trace("%c ", c);
+      /*debug_trace("%c ", c);*/
       /* Rule: we can have 0x1b (ESC) only at the start */
       if (c == '\x1b' && key_cnt > 1)  /* adding esc at end of collection? */
       {
         key_cnt = 0;  /* scrap it! */
-        debug_trace("scrap");
+        /*debug_trace("scrap");*/
       }
 
       if (key_cnt == sizeof(key_buf))
       {
         key_cnt = 0;
-        debug_trace("overflow");
+        /*debug_trace("overflow");*/
       }
 
       /* Add character to the key sequence */
@@ -875,17 +882,17 @@ static int s_disp_process_events(dispc_t *disp)
       {
         case 0:  /* no match */
           {
-          char *p;
+          /*char *p;
           debug_trace("unrecognized sequence\n");
           debug_trace(": ");
           while (*p != '\0')
             debug_trace("%x ", *p++);
-          debug_trace("\n");
+          debug_trace("\n");*/
           }
           break;
 
         case 1: /* partial match */
-          debug_trace("partial match\n");
+          /*debug_trace("partial match\n");*/
           break;
 
         case 2: /* complete match */
@@ -893,7 +900,7 @@ static int s_disp_process_events(dispc_t *disp)
           {
           char key_name_buf[24];
           disp_get_key_name(disp, key, key_name_buf, sizeof(key_name_buf));
-          debug_trace("sys_key: %s, ascii: %c\n", key_name_buf, key & 0xff);
+          /*debug_trace("sys_key: %s, ascii: %c\n", key_name_buf, key & 0xff);*/
           }
 
           disp_event_clear(&ev);

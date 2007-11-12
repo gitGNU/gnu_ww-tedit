@@ -256,7 +256,7 @@ static BOOLEAN CheckSave(TFile *pFile, void *_pContext)
   ASSERT(VALID_PFILE(pFile));
 
   pContext = _pContext;
-  disp = wrkspace_get_disp(CMDC_WRKSPACE(pContext));
+  disp = wrkspace_get_disp(pContext->wrkspace);
   if (pFile->bChanged)
   {
     if (!pContext->bCheck)

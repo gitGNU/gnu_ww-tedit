@@ -8,7 +8,7 @@ SET(CMAKE_VERBOSE_MAKEFILE FALSE)
 IF (CYGWIN)
   SET(MY_WIN32 0)
 ELSE (CYGWIN)
-  SET(MY_WIN32 WIN32)
+  SET(MY_WIN32 ${WIN32})
 ENDIF (CYGWIN)
 
 # Debug build by default
@@ -29,7 +29,7 @@ ENDIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
 IF (UNIX)
   set(warn_def "-Wall")
 ELSE (UNIX)
-  set(warn_def "-W4")
+  set(warn_def "-W3")
 ENDIF (UNIX)
 
 # WIN32: use dbghelp library if installed in src/dbghelp
@@ -133,6 +133,7 @@ SET(ww_main_src src/assertsc.c
                 src/searchf.c
                 src/searcmd.c
                 src/smalledt.c
+                src/strlwr.c
                 src/tblocks.c
                 src/umenu.c
                 src/undo.c
@@ -141,9 +142,9 @@ SET(ww_main_src src/assertsc.c
                 src/wline.c
                 src/wrkspace.c
                 src/ww.c
-                src/fpcalc/CALC_TAB.c
-                src/fpcalc/CALCFUNC.c
-                src/fpcalc/LEXFCALC.c
+                src/fpcalc/calc_tab.c
+                src/fpcalc/calcfunc.c
+                src/fpcalc/lexfcalc.c
                 src/c_syntax/c_syntax.c
                 src/c_syntax/funcs.c
                 src/c_syntax/synh.c)
@@ -165,7 +166,7 @@ IF (MY_WIN32)
   TARGET_LINK_LIBRARIES(ww ${dbghelp_lib})
 ELSE (MY_WIN32)
   ADD_EXECUTABLE(ww ${ww_src})
-  TARGET_LINK_LIBRARIES(ww curses)
+  TARGET_LINK_LIBRARIES(ww curses m)
 ENDIF (MY_WIN32)
 
 IF (MY_WIN32)
@@ -174,12 +175,12 @@ SET_TARGET_PROPERTIES(ww PROPERTIES
                       LINK_FLAGS_RELEASE "/incremental:no")
 ENDIF (MY_WIN32)
 
-IF (UNIX)
+IF (CYGWIN)
 # --enable-auto-imports: it is for the GNU linker on cygwin
 # to suppress "resolving _stdscr by linking to __imp__stdscr (auto-import)"
 # linker is called via gcc, -Xlinker to pass the option to the linker
 SET_TARGET_PROPERTIES(ww PROPERTIES
                       LINK_FLAGS_DEBUG "-Xlinker --enable-auto-import"
                       LINK_FLAGS_RELEASE "-Xlinker --enable-auto-import")
-ENDIF (UNIX)
+ENDIF (CYGWIN)
 
