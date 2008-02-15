@@ -12,6 +12,7 @@ Descrition:
 */
 
 #include "global.h"
+#include "disp.h"
 #include "palette.h"
 
 BYTE BorlandPalette[MAX_PALETTE] =
@@ -146,6 +147,109 @@ BYTE *CPalette = VCPalette;        /* Current palette */
 #else
 BYTE *CPalette = BorlandPalette;        /* Current palette */
 #endif
+
+#include "disp.h"
+
+unsigned int ww_pal[MAX_PALETTE];
+
+int pal_init(dispc_t *disp)
+{
+#define PAL_ADD(idx, b, c, style) \
+  if (!disp_pal_add(disp, \
+                   disp_pal_get_standard(disp, c), \
+                   disp_pal_get_standard(disp, b), \
+                   style, &ww_pal[idx])) \
+    return 0;
+
+  PAL_ADD(coStatus, 0x7, 0x0, 0);
+  PAL_ADD(coError, 0x4, 0xf, 0);
+  PAL_ADD(coTabs, 0x4, 0xf, 0);
+  PAL_ADD(coReadOnly, 0x4, 0xe, 0);
+  PAL_ADD(coRecStored, 0x7, 0x1, 0);
+  PAL_ADD(coStatusTxt, 0x7, 0x0, 0);
+  PAL_ADD(coStatusShortCut, 0x7, 0x4, 0);
+
+  #ifdef DARK_BPAL
+  PAL_ADD(coEOF, 0x0, 0xf, 0);
+  PAL_ADD(coEdText, 0x0, 0xe, 0);
+  PAL_ADD(coEdBlock, 0x7, 0x0, 0);
+  PAL_ADD(coEdNumber, 0x0, 0xe, 0);
+  PAL_ADD(coEdComment, 0x0, 0x7, 0);
+  PAL_ADD(coEdReserved, 0x0, 0xf, 0);
+  PAL_ADD(coEdRegister, 0x0, 0xa, 0);
+  PAL_ADD(coEdInstruction, 0x0, 0xf, 0);
+  PAL_ADD(coEdString, 0x0, 0xe, 0);
+  PAL_ADD(coEdPreproc, 0x0, 0xa, 0);
+  PAL_ADD(coEdOper, 0x0, 0xf, 0);
+  PAL_ADD(coEdSFR, 0x0, 0xb, 0);
+  PAL_ADD(coEdPair, 0x0, 0xa, 0);
+  #else
+  PAL_ADD(coEOF, 0x1, 0xf, 0);
+  PAL_ADD(coEdText, 0x1, 0xe, 0);
+  PAL_ADD(coEdBlock, 0x7, 0x0, 0);
+  PAL_ADD(coEdNumber, 0x1, 0xe, 0);
+  PAL_ADD(coEdComment, 0x1, 0x7, 0);
+  PAL_ADD(coEdReserved, 0x1, 0xf, 0);
+  PAL_ADD(coEdRegister, 0x1, 0xa, 0);
+  PAL_ADD(coEdInstruction, 0x1, 0xf, 0);
+  PAL_ADD(coEdString, 0x1, 0xe, 0);
+  PAL_ADD(coEdPreproc, 0x1, 0xa, 0);
+  PAL_ADD(coEdOper, 0x1, 0xf, 0);
+  PAL_ADD(coEdSFR, 0x1, 0xb, 0);
+  PAL_ADD(coEdPair, 0x1, 0xa, 0);
+  #endif
+
+  PAL_ADD(coEdTooltip, 0x3, 0x0, 0);
+  PAL_ADD(coEdBlockCursor, 0x6, 0x0, 0);
+  PAL_ADD(coEdBookmark, 0x2, 0x0, 0);
+  PAL_ADD(coSmallEdEOF, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEdText, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEdBlock, 0x7, 0x0, 0);
+  PAL_ADD(coSmallEdNumber, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEditEdComment, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEditEdReserved, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEditEdRegister, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEditEdInstruction, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEditEdString, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEditEdPreproc, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEditEdOper, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEditEdSFR, 0x0, 0xa, 0);
+  PAL_ADD(coSmallEditEdPair, 0x0, 0xf, 0);
+  PAL_ADD(coSmallEdTooltip, 0x1, 0x0, 0);
+  PAL_ADD(coSmallEdBlockCursor, 0x6, 0x0, 0);
+  PAL_ADD(coSmallEdBookmark, 0x0, 0x2, 0);
+  PAL_ADD(coEnterLn, 0x0, 0xa, 0);
+  PAL_ADD(coUnchanged, 0x2, 0x0, 0);
+  PAL_ADD(coEnterLnPrompt, 0x0, 0xb, 0);
+  PAL_ADD(coEnterLnBraces, 0x0, 0x2, 0);
+  PAL_ADD(coUMenuFrame, 0x7, 0x0, 0);
+  PAL_ADD(coUMenuItems, 0x7, 0x0, 0);
+  PAL_ADD(coUMenuSelected, 0x2, 0x0, 0);
+  PAL_ADD(coUMenuTitle, 0x7, 0x0, 0);
+  PAL_ADD(coHelpFrame, 0x3, 0x0, 0);
+  PAL_ADD(coHelpItems, 0x3, 0x0, 0);
+  PAL_ADD(coHelpSelected, 0x3, 0xe, 0);
+  PAL_ADD(coHelpTitle, 0x3, 0x0, 0);
+
+  PAL_ADD(coMenu, 0x7, 0x0, 0);
+  PAL_ADD(coMenuShortCut, 0x7, 0x4, 0);
+  PAL_ADD(coMenuSelected, 0x2, 0x0, 0);
+  PAL_ADD(coMenuSeShortCt, 0x2, 0x4, 0);
+  PAL_ADD(coMenuDisabled, 0x7, 0x8, 0);
+  PAL_ADD(coMenuFrame, 0x7, 0x0, 0);
+  PAL_ADD(coMenuSeDisabl, 0x0, 0x8, 0);
+  PAL_ADD(coCtxHlpMenu, 0x3, 0xf, 0);
+  PAL_ADD(coCtxHlpMenuShortCut, 0x3, 0x0, 0);
+  PAL_ADD(coCtxHlpMenuSelected, 0x0, 0xe, 0);
+  PAL_ADD(coCtxHlpMenuSeShortCt, 0x0, 0x7, 0);
+  PAL_ADD(coCtxHlpMenuDisabled, 0x3, 0x7, 0);
+  PAL_ADD(coCtxHlpMenuFrame, 0x3, 0x0, 0);
+  PAL_ADD(coCtxHlpMenuSeDisabl, 0x3, 0xe, 0);
+  PAL_ADD(coTerm1, 0x0, 0x2, 0);
+  PAL_ADD(coTerm2, 0x0, 0xa, 0);
+
+  return 1;
+}
 
 /*
 This software is distributed under the conditions of the BSD style license.

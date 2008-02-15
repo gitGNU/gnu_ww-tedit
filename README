@@ -105,15 +105,20 @@ API documentation of the modules is generated in doxy/html.
 Tips for using WW in a text terminal
 ------------------------------------
 When running WW in a text terminal most of the CUI key combinations are not
-working. For example, the arrow keys work everywhere but on many terminals the shift+arrow combination doesn't emit any distinctive key sequence rendering many editor functions unaccessible. Alternative set of key bindings can be used to invoke those unreachable functions.
+working. For example, the arrow keys work everywhere but on many terminals
+the shift+arrow combination doesn't emit any distinctive key sequence
+rendering many editor functions unaccessible. Alternative set of key bindings
+can be used to invoke those unreachable functions.
 
 Frequently used editor functions are assigned to 'ctrl' combinations.
 
-ctrl+e -- enters text selection mode. The current cursor position is marked as one end of the selection and the arrow keys will extend the range by moving the position of the other end.  After that any block
-manipulation operation will use the current selection and will also
-end the mode. For example, to copy text, start with ctrl+e,
-use arrows to select, and to copy press ctrl+c, this will put the text in the
-clipboard and at the same time end the selection mode.
+ctrl+e -- enters text selection mode. The current cursor position is marked as
+one end of the selection and the arrow keys will extend the range by moving
+the position of the other end.  After that any block manipulation operation
+will use the current selection and will also end the mode. For example, to
+copy text, start with ctrl+e, use arrows to select, and to copy press ctrl+c,
+this will put the text in the clipboard and at the same time end the selection
+mode.
 
 ctrl+d, e -- toggle column block mode
 
@@ -123,7 +128,9 @@ ctrl+d, i -- incremental search mode
 
 ctrl+d, left -- previous word, substitute for ctrl+left-arrow
 ctrl+d, right -- next word, subsitute for ctrl+right-arrow
-ctrl+d, ctrl+left/right also works. This is convenient in to make cursor jump over a few words in the same direction -- the operation can be executed without releasing the `ctrl' key.
+ctrl+d, ctrl+left/right also works. This is convenient in to make cursor jump
+over a few words in the same direction -- the operation can be executed without
+releasing the `ctrl' key.
 
 ctrl+d, home -- top of file, substitute for ctrl+home
 ctrl+d, end -- bottom of file, subtitute for ctrl+end
@@ -152,13 +159,17 @@ combinations. Every other terminal is with varying degree of limitations.
 
 How to extend the table of terminal key sequences
 --------------------------------------------------------------------
-The editor has quite complete set of key sequences already. But once in a while
-there is a terminal that emits sequences that are not in the ncurs_disp.c file. New entries can be easilly added to the s_keys[] table.
+The editor has quite complete set of key sequences already. But once in
+a while there is a terminal that emits sequences that are not in the
+ncurs_disp.c file. New entries can be easilly added to the s_keys[] table.
 
-First the actual sequence must be obtained. There is a convenient script, keys.pl, which can be downloaded from here:
+First the actual sequence must be obtained. There is a convenient script,
+keys.pl, which can be downloaded from here:
 http://geocities.com/h2428/petar/bash_bind.htm
 
-Press the new keys while the script is running. For example, the discovery of what are the key sequences for `home' and `end' on putty will look like this:
+Press the new keys while the script is running. For example, the discovery
+of what are the key sequences for `home' and `end' on putty will look like
+this:
 
 $ ./keys.pl
 press 'x' to exit

@@ -11,8 +11,8 @@ Descrition:
 
 #include "global.h"
 #include "tarray.h"
-#include "palette.h"
 #include "disp.h"
+#include "palette.h"
 #include "heapg.h"
 #include "memory.h"
 #include "l1opt.h"

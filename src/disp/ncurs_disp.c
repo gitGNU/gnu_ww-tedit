@@ -40,8 +40,6 @@ prototype of assert.
 /* The top level API, platform independent part */
 #include "disp_common.c"
 
-#define DISP_COUNTOF(x)  (sizeof(x) / sizeof((x)[0]))
-
 /*!
 @brief Maps DOS palette to ncurses color pairs (ncurses)
 
@@ -56,6 +54,8 @@ array will have their CURSES pair counterpart. As CURSES can have up to
 
 @return 0 failure in allocating ncurses color pairs
 @return 1 no error
+
+TODO: remove this function
 */
 int disp_map_palette(dispc_t *disp, unsigned char *pal, int num_entries)
 {

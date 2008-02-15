@@ -109,9 +109,12 @@ enum Colors
 #define _co_MenuFrame 5
 #define _co_MenuSeDisabl 6
 
-#define GetColor(c) (CPalette[c])
-extern BYTE *CPalette;        /* Current palette */
-extern BYTE BorlandPalette[MAX_PALETTE];
+extern unsigned int ww_pal[];
+#define GetColor(c) (ww_pal[(c)])
+
+#include "disp.h"
+
+int pal_init(dispc_t *disp);
 
 #endif  /* ifndef PALETTE_H */
 

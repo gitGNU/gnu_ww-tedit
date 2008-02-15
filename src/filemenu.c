@@ -11,9 +11,9 @@ Descrition:
 */
 
 #include "global.h"
-#include "palette.h"
 #include "memory.h"
 #include "disp.h"
+#include "palette.h"
 #include "path.h"
 #include "l1def.h"
 #include "l2disp.h"

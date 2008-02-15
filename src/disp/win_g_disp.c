@@ -40,17 +40,6 @@ prototype of assert.
 #include "disp_common.c"
 
 /*!
-@brief No need to map palette, stub function (win32 GUI)
-*/
-int disp_map_palette(dispc_t *disp, unsigned char *pal, int num_entries)
-{
-  DISP_REFERENCE(disp);
-  DISP_REFERENCE(pal);
-  DISP_REFERENCE(num_entries);
-  return 1;
-}
-
-/*!
 @brief Gets human readable message for a system error (win32 GUI)
 
 @param disp  a dispc object
@@ -71,6 +60,250 @@ static void s_disp_translate_os_error(dispc_t *disp)
   _snprintf(disp->os_error_msg, sizeof(disp->os_error_msg),
             "WINDOWS error %#0x: %s", win_err, msg_buf);
 }
+
+#define DISP_FONT_STYLE_BITS (DISP_FONT_ITALIC | DISP_FONT_BOLD | DISP_FONT_UNDERLINE)
+
+/*!
+@brief Instantiates a font with specific style
+
+If the font has been already created it returns it ID, otherwise it
+creates a new one
+
+@param disp a dispc object
+@return font id
+@return -1 error, disp->code & disp->error_msg are set
+*/
+static int s_disp_add_font(dispc_t *disp, unsigned int font_style)
+{
+  int i;
+
+  /* only valid bits are set */
+  ASSERT((font_style & DISP_FONT_STYLE_BITS) == font_style);
+
+  for (i = 0; i < DISP_COUNTOF(disp->fonts); ++i)
+  {
+    if (disp->fonts[i].font == 0)
+      break;
+    if (disp->fonts[i].style == font_style)
+    {
+      ++disp->fonts[i].ref_cnt;
+      return i;
+    }
+  }
+
+  if (i == DISP_COUNTOF(disp->fonts))
+  {
+    disp->code = DISP_FONT_STYLE_OVERFLOW;
+    _snprintf(disp->error_msg, sizeof(disp->error_msg),
+              "no room for additional font styles");
+    return -1;
+  }
+
+  disp->fonts[i].font =
+    CreateFont(disp->geom_param.font_size, /* nHeight, height of font */
+               0,            /* nWidth, average character width */
+               0,            /* nEscapement, angle of escapement */
+               0,            /* nOrientation, base-line orientation angle */
+               (font_style & DISP_FONT_BOLD != 0) ?
+               800 : 400,          /* fnWeight, font weight */
+               (font_style & DISP_FONT_ITALIC != 0), /* fdwItalic, italic attribute option */
+               (font_style & DISP_FONT_UNDERLINE != 0),        /* fdwUnderline, underline attribute option */
+               FALSE,        /* fdwStrikeOut, strikeout attribute option */
+               DEFAULT_CHARSET,      /* fdwCharSet, character set identifier */
+               OUT_DEFAULT_PRECIS,   /* fdwOutputPrecision, output precision */
+               CLIP_DEFAULT_PRECIS,  /* fdwClipPrecision, clipping precision */
+               DEFAULT_QUALITY,      /* fdwQuality, output quality */
+               FIXED_PITCH | FF_DONTCARE, /* fdwPitchAndFamily, pitch and family*/
+               disp->geom_param.font_name);  /* lpszFace, typeface name */
+  if (disp->fonts[i].font == NULL)
+  {
+    disp->code = DISP_FONT_FAILED_TO_LOAD;
+    _snprintf(disp->error_msg, sizeof(disp->error_msg),
+              "failed to load font %s", disp->geom_param.font_name);
+    s_disp_translate_os_error(disp);
+    return -1;
+  }
+  disp->fonts[i].style = font_style;
+  return i;
+}
+
+/*!
+@brief Adds new entry to the palette
+
+@param disp a dispc object
+@param rgb_color       WIN32 rgb foreground color
+@param rgb_backgroung  WIN32 rgb background color
+@param font_style      bit mask for font style
+@param *palette_id     returns here a handle to palette entry
+@return 0 error, disp->code & disp->error_msg are set
+*/
+static int s_disp_pal_add(dispc_t *disp,
+                 unsigned int rgb_color, unsigned int rgb_background,
+                 unsigned font_style, int *palette_id)
+{
+  int i;
+  int font_id;
+
+  /* check: only valid bits are set */
+  ASSERT((font_style & DISP_FONT_STYLE_BITS) == font_style);
+  ASSERT(palette_id != NULL);
+
+  font_id = s_disp_add_font(disp, font_style);
+  if (font_id == -1)
+    return 0;
+  for (i = 0; i < DISP_COUNTOF(disp->palette); ++i)
+  {
+    if (disp->palette[i].in_use)
+      continue;
+    disp->palette[i].in_use = 1;
+    disp->palette[i].font_id = font_id;
+    disp->palette[i].color = rgb_color;
+    disp->palette[i].background = rgb_background;
+    *palette_id = i;
+    return 1;
+  }
+
+  /* no space in the palette table */
+  disp->code = DISP_PALETTE_FULL;
+  _snprintf(disp->error_msg, sizeof(disp->error_msg),
+            "no more entries available in the palette table");
+  return 0;
+}
+
+/*!
+@brief Disposes of one palette entry.
+
+Fonts are freed if no palette entry uses them.
+
+@param disp        a dispc object
+@param palette_id  id of palette entry from disp_pal_add()
+*/
+static void s_disp_pal_free(dispc_t *disp, int palette_id)
+{
+  /* TODO: implement if needed */
+  DISP_REFERENCE(disp);
+  DISP_REFERENCE(palette_id);
+}
+
+/*!
+@brief 16 colors
+*/
+static DWORD s_disp_colors[16] =
+{
+  RGB( 0x00, 0x00, 0x00 ),
+  RGB( 0x00, 0x00, 0x80 ),
+  RGB( 0x00, 0x80, 0x00 ),
+  RGB( 0x00, 0x80, 0x80 ),
+  RGB( 0x80, 0x00, 0x00 ),
+  RGB( 0x80, 0x00, 0x80 ),
+  RGB( 0x80, 0x80, 0x00 ),
+  RGB( 0xC0, 0xC0, 0xC0 ),
+
+  RGB( 0x80, 0x80, 0x80 ),
+  RGB( 0x00, 0x00, 0xFF ),
+  RGB( 0x00, 0xFF, 0x00 ),
+  RGB( 0x00, 0xFF, 0xFF ),
+  RGB( 0xFF, 0x00, 0x00 ),
+  RGB( 0xFF, 0x00, 0xFF ),
+  RGB( 0xFF, 0xFF, 0x00 ),
+  RGB( 0xFF, 0xFF, 0xFF ),
+};
+
+/*!
+@brief Platform dependent color
+
+This function works on WIN32 gui platform.
+
+@param disp   a dispc object
+@param color  one of the original 16 DOS colors
+
+@returns platrorm dependent color value
+*/
+static unsigned long s_disp_pal_get_standard(const dispc_t *disp, int color)
+{
+  DISP_REFERENCE(disp);
+  ASSERT(color >= 0);
+  ASSERT(color < DISP_COUNTOF(s_disp_colors));
+
+  return s_disp_colors[color];
+}
+
+/*!
+@brief Finds if specific palette entry is within range
+
+@param disp        a dispc object
+@param palette_id  palette ID of display attribute
+*/
+static int s_disp_palette_id_is_valid(const dispc_t *disp, int palette_id)
+{
+  DISP_REFERENCE(disp);
+  return (palette_id < DISP_COUNTOF(disp->palette));
+}
+
+/*!
+@brief Finds color for specific palette entry
+
+@param disp        a dispc object
+@param palette_id  palette ID of display attribute
+*/
+static unsigned int s_disp_pal_get_color(const dispc_t *disp, int palette_id)
+{
+  ASSERT(s_disp_palette_id_is_valid(disp, palette_id));
+
+  return disp->palette[palette_id].color;
+}
+
+/*!
+@brief Finds background for specific palette entry
+
+@param disp        a dispc object
+@param palette_id  palette ID of display attribute
+*/
+static unsigned int s_disp_pal_get_background(const dispc_t *disp, int palette_id)
+{
+  ASSERT(s_disp_palette_id_is_valid(disp, palette_id));
+
+  return disp->palette[palette_id].background;
+}
+
+/*!
+@brief Finds fond handle for specific palette entry
+
+@param disp        a dispc object
+@param palette_id  palette ID of display attribute
+*/
+static HFONT s_disp_pal_get_font(const dispc_t *disp, int palette_id)
+{
+  int font_id;
+
+  ASSERT(s_disp_palette_id_is_valid(disp, palette_id));
+
+  font_id = disp->palette[palette_id].font_id;
+  ASSERT(font_id < DISP_COUNTOF(disp->fonts));
+  return disp->fonts[font_id].font;
+}
+
+/*!
+@brief  Platform dependent color
+
+For RGB of standard 16 DOS colors use disp_pal_standard().
+This function only works on WIN32.
+
+@param disp   a dispc object
+@param r      red component
+@param g      green component
+@param b      blue component
+
+@returns platrorm dependent color value
+*/
+static unsigned long s_disp_pal_compose_rgb(const dispc_t *disp,
+                                            int r, int g, int b)
+{
+  DISP_REFERENCE(disp);
+
+  return RGB(r, g, b);
+}
+
 
 /*!
 @brief Marks area of the screen as invalid. (win32 GUI)
@@ -216,30 +449,6 @@ static disp_wnd_param_t s_default_wnd_param =
 };
 
 /*!
-@brief 16 colors
-*/
-static DWORD s_disp_colors[16] =
-{
-  RGB( 0x00, 0x00, 0x00 ),
-  RGB( 0x00, 0x00, 0x80 ),
-  RGB( 0x00, 0x80, 0x00 ),
-  RGB( 0x00, 0x80, 0x80 ),
-  RGB( 0x80, 0x00, 0x00 ),
-  RGB( 0x80, 0x00, 0x80 ),
-  RGB( 0x80, 0x80, 0x00 ),
-  RGB( 0xC0, 0xC0, 0xC0 ),
-
-  RGB( 0x80, 0x80, 0x80 ),
-  RGB( 0x00, 0x00, 0xFF ),
-  RGB( 0x00, 0xFF, 0x00 ),
-  RGB( 0x00, 0xFF, 0xFF ),
-  RGB( 0xFF, 0x00, 0x00 ),
-  RGB( 0xFF, 0x00, 0xFF ),
-  RGB( 0xFF, 0xFF, 0x00 ),
-  RGB( 0xFF, 0xFF, 0xFF ),
-};
-
-/*!
 @brief Called whenever a segment of the window must be redrawn  (win32 GUI)
 
 The WM_PAINT message is sent when the system or another application makes
@@ -265,11 +474,14 @@ static void s_disp_on_paint(dispc_t *disp, HDC dc, const RECT *upd)
   int segment_len;
   int correction_len;
 
-  /* check for empty update area */
-  if (upd->left == upd->right || upd->top == upd->bottom)
-    return;
+  /*
+  In this function:
+  For the designated area we copy characters and
+  attributes from disp->char_buf to the screen area of the window.
+  */
 
-  SelectObject(dc, disp->font);
+  if (upd->left == upd->right || upd->top == upd->bottom)
+    return;  /* empty update area */
 
   x1 = upd->left / disp->char_size.cx;
   x2 = (upd->right - 1) / disp->char_size.cx + 1;
@@ -290,6 +502,12 @@ static void s_disp_on_paint(dispc_t *disp, HDC dc, const RECT *upd)
   cur_attr = 0;
   rc.left = rc.top = rc.bottom = rc.right = 0;
 
+  /*
+  For each line of the region, determine segments which have
+  same attributes. Output those segments as single call to WIN32.
+  Patch end of the line for cases when window width is not multiple
+  of character size.
+  */
   for (y = y1; y < y2; ++y)
   {
     /*
@@ -306,7 +524,7 @@ static void s_disp_on_paint(dispc_t *disp, HDC dc, const RECT *upd)
         /* display white spaces */
         segment_len = w;
         memset(disp_buf, ' ', w);
-        cur_attr = s_disp_colors[15];
+        cur_attr = disp->default_attr;
       }
       else
       {
@@ -338,8 +556,9 @@ static void s_disp_on_paint(dispc_t *disp, HDC dc, const RECT *upd)
 
       rc.right = rc.left + segment_len * disp->char_size.cx;
 
-      SetTextColor(dc, s_disp_colors[cur_attr & 15]);
-      SetBkColor(dc, s_disp_colors[(cur_attr >> 4) & 15]);
+      SetTextColor(dc, s_disp_pal_get_color(disp, cur_attr));
+      SetBkColor(dc, s_disp_pal_get_background(disp, cur_attr));
+      SelectObject(dc, s_disp_pal_get_font(disp, cur_attr));
 
       TextOut(dc, rc.left, rc.top, disp_buf, segment_len);
 
@@ -354,6 +573,7 @@ static void s_disp_on_paint(dispc_t *disp, HDC dc, const RECT *upd)
         if (x2 == disp->geom_param.width)
           ++correction_len;  /* correct the bottom right corner */
         memset(disp_buf, ' ', correction_len);
+        SelectObject(dc, s_disp_pal_get_font(disp, disp->default_attr));
         TextOut(dc, rc.left, rc.top + disp->char_size.cy, disp_buf, correction_len);
       }
 
@@ -370,8 +590,9 @@ static void s_disp_on_paint(dispc_t *disp, HDC dc, const RECT *upd)
     if (x2 == disp->geom_param.width)  /* last char on screen? */
     {
       /* Output one space with the color of the last character */
-      SetTextColor(dc, s_disp_colors[cur_attr & 15]);
-      SetBkColor(dc, s_disp_colors[(cur_attr >> 4) & 15]);
+      SetTextColor(dc, s_disp_pal_get_color(disp, cur_attr));
+      SetBkColor(dc, s_disp_pal_get_background(disp, cur_attr));
+      SelectObject(dc, s_disp_pal_get_font(disp, disp->default_attr));
 
       /* rc.left is already at the edge of the screen */
       TextOut(dc, rc.left, rc.top, " ", 1);
@@ -815,38 +1036,17 @@ static int s_disp_init(dispc_t *disp)
   WINDOWPLACEMENT wndpl;
   int is_maximized2;
 
-  /*
-  Load font
-  */
-  disp->font =
-    CreateFont(disp->geom_param.font_size, /* nHeight, height of font */
-               0,            /* nWidth, average character width */
-               0,            /* nEscapement, angle of escapement */
-               0,            /* nOrientation, base-line orientation angle */
-               400,          /* fnWeight, font weight */
-               FALSE,        /* fdwItalic, italic attribute option */
-               FALSE,        /* fdwUnderline, underline attribute option */
-               FALSE,        /* fdwStrikeOut, strikeout attribute option */
-               DEFAULT_CHARSET,      /* fdwCharSet, character set identifier */
-               OUT_DEFAULT_PRECIS,   /* fdwOutputPrecision, output precision */
-               CLIP_DEFAULT_PRECIS,  /* fdwClipPrecision, clipping precision */
-               DEFAULT_QUALITY,      /* fdwQuality, output quality */
-               FIXED_PITCH | FF_DONTCARE, /* fdwPitchAndFamily, pitch and family*/
-               disp->geom_param.font_name);  /* lpszFace, typeface name */
-  if (disp->font == NULL)
-  {
-    disp->code = DISP_FONT_FAILED_TO_LOAD;
-    _snprintf(disp->error_msg, sizeof(disp->error_msg),
-              "failed to load font %s", disp->geom_param.font_name);
-    s_disp_translate_os_error(disp);
+  if (!s_disp_pal_add(disp,
+                   s_disp_pal_get_standard(disp, 0),   /* black */
+                   s_disp_pal_get_standard(disp, 15),  /* white */
+                   0, &disp->default_attr))
     return 0;
-  }
 
   /*
   Get character size
   */
   dc = GetDC(NULL);
-  SelectObject(dc, disp->font);
+  SelectObject(dc, s_disp_pal_get_font(disp, disp->default_attr));
   GetTextExtentPoint32(dc, _T("H"), 1, &disp->char_size);
   ReleaseDC(NULL, dc);
 

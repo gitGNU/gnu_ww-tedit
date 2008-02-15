@@ -78,6 +78,10 @@ enum disp_error
   DISP_NCURSES_MODE_SETUP_FAILURE,
   /*! failed in allocating color pairs */
   DISP_NCURSES_COLOR_ALLOC_FAIL,
+  /*! no more room for font styles */
+  DISP_FONT_STYLE_OVERFLOW,
+  /*! no more space in palette table */
+  DISP_PALETTE_FULL,
 };
 
 void disp_error_get(dispc_t *disp, enum disp_error *code,
@@ -117,7 +121,21 @@ void disp_set_resize_handler(dispc_t *disp,
                                                    void *ctx),
                              void *handle_resize_ctx);
 
-int disp_map_palette(dispc_t *disp, unsigned char *pal, int num_entries);
+/* bit masks for font_style */
+#define DISP_FONT_ITALIC 1
+#define DISP_FONT_BOLD  2
+#define DISP_FONT_UNDERLINE 4
+
+unsigned long disp_pal_get_standard(const dispc_t *disp, int color);
+unsigned long disp_pal_compose_rgb(const dispc_t *disp, int r, int g, int b);
+int disp_pal_add(dispc_t *disp,
+                 unsigned long rgb_color, unsigned long rgb_background,
+                 unsigned font_style, int *palette_id);
+void disp_pal_free(dispc_t *disp, int palette_id);
+
+int disp_is_only_basic_colors(dispc_t *disp);
+int disp_is_gui(dispc_t *disp);
+
 void disp_cbuf_reset(const dispc_t *disp, disp_char_buf_t *cbuf, int max_characters);
 void disp_cbuf_mark_invalid(const dispc_t *disp, disp_char_buf_t *cbuf);
 void disp_cbuf_put_char(const dispc_t *disp,

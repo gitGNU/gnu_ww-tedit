@@ -35,7 +35,7 @@ static char disp_id[] = "disp-lib";
 #else
 #define DISP_REFERENCE(x)
 #endif
-
+#define DISP_COUNTOF(x)  (sizeof(x) / sizeof((x)[0]))
 #define DISP_LO_BYTE(x) (unsigned char)((unsigned)(x) & 0xff)
 
 /* To be used in ASSERT()! */
@@ -56,6 +56,14 @@ on which platform the library is compiled.
 static int s_disp_init(dispc_t *disp);
 static void s_disp_set_cursor_pos(dispc_t *disp, int x, int y);
 static void s_disp_show_cursor(dispc_t *disp, int caret_is_visible);
+static int s_disp_pal_add(dispc_t *disp,
+                 unsigned int rgb_color, unsigned int rgb_background,
+                 unsigned font_style, int *palette_id);
+static void s_disp_pal_free(dispc_t *disp, int palette_id);
+static int s_disp_palette_id_is_valid(const dispc_t *disp, int palette_id);
+static unsigned long s_disp_pal_get_standard(const dispc_t *disp, int color);
+static unsigned long s_disp_pal_compose_rgb(const dispc_t *disp,
+                                            int r, int g, int b);
 static void s_disp_validate_rect(dispc_t *disp,
                                  int x, int y,
                                  int w, int h);
@@ -445,6 +453,77 @@ void disp_set_resize_handler(dispc_t *disp,
   disp->handle_resize_ctx = handle_resize_ctx;
 }
 
+/*!
+@brief Platform dependent color
+
+This function works on all platforms.
+
+@param disp   a dispc object
+@param color  one of the original 16 DOS colors
+
+@returns platrorm dependent color value
+*/
+unsigned long disp_pal_get_standard(const dispc_t *disp, int color)
+{
+  ASSERT(VALID_DISP(disp));
+
+  return s_disp_pal_get_standard(disp, color);
+}
+
+/*!
+@brief  Platform dependent color
+
+For RGB of standard 16 DOS colors use disp_pal_standard().
+This function only works on WIN32 and X GUI platforms.
+
+@param disp   a dispc object
+@param r      red component
+@param g      green component
+@param b      blue component
+
+@returns platrorm dependent color value
+*/
+unsigned long disp_pal_compose_rgb(const dispc_t *disp, int r, int g, int b)
+{
+  ASSERT(VALID_DISP(disp));
+  return s_disp_pal_compose_rgb(disp, r, g, b);
+}
+
+/*!
+@brief Adds an entry to the palette of the display
+
+@param disp            a dispc object
+@param rgb_color       WIN32 rgb foreground color
+@param rgb_backgroung  WIN32 rgb background color
+@param font_style      bit mask for font style
+@param *palette_id     returns here a handle to palette entry
+
+@return -1 error, disp->code & disp->error_msg are set
+*/
+int disp_pal_add(dispc_t *disp,
+                 unsigned long rgb_color, unsigned long rgb_background,
+                 unsigned font_style, int *palette_id)
+{
+  ASSERT(VALID_DISP(disp));
+
+  return s_disp_pal_add(disp,
+                        rgb_color, rgb_background, font_style, palette_id);
+}
+
+/*!
+@brief Disposes of one palette entry.
+
+Fonts are freed if no palette entry uses them.
+
+@param disp        a dispc object
+@param palette_id  id of palette entry from disp_pal_add()
+*/
+void disp_pal_free(dispc_t *disp, int palette_id)
+{
+  ASSERT(VALID_DISP(disp));
+  s_disp_pal_free(disp, palette_id);
+}
+
 #ifdef _DEBUG
 /*!
 @brief Checks if *cbuf points to a valid disp_char_buf object.
@@ -548,7 +627,7 @@ function gives write access to disp_char_but_t data.
 @param disp      a display object
 @param dest_buf  output here
 @param index     position
-@param attr      data
+@param attr      palette ID of attributes
 */
 void disp_cbuf_put_attr(const dispc_t *disp,
                         disp_char_buf_t *dest_buf, int index, int attr)
@@ -556,6 +635,7 @@ void disp_cbuf_put_attr(const dispc_t *disp,
   DISP_REFERENCE(*disp);
   ASSERT(VALID_DISP_CHAR_BUF(dest_buf));
   ASSERT(index < dest_buf->max_characters);
+  ASSERT(s_disp_palette_id_is_valid(disp, attr));
 
   dest_buf->cbuf[index].a = DISP_LO_BYTE(attr);
 }
@@ -570,7 +650,7 @@ function gives write access to disp_char_but_t data.
 @param dest_buf  output here
 @param index     position
 @param c         data
-@param attr      data
+@param attr      palette ID of display attribute
 */
 void disp_cbuf_put_char_attr(const dispc_t *disp,
                              disp_char_buf_t *dest_buf,
@@ -579,9 +659,10 @@ void disp_cbuf_put_char_attr(const dispc_t *disp,
   DISP_REFERENCE(*disp);
   ASSERT(VALID_DISP_CHAR_BUF(dest_buf));
   ASSERT(index < dest_buf->max_characters);
+  ASSERT(s_disp_palette_id_is_valid(disp, attr));
 
   dest_buf->cbuf[index].c = DISP_LO_BYTE(c);
-  dest_buf->cbuf[index].a = DISP_LO_BYTE(attr);
+  dest_buf->cbuf[index].a = attr;
 }
 
 /*!
@@ -733,7 +814,7 @@ refresh call to the OS if nothing changed.
 @param s     string to display
 @param x     coordinates
 @param y     coordinates
-@param attr  attributes
+@param attr  palette ID of display attributes
 */
 void disp_write(dispc_t *disp,
                 const char *s, int x, int y, int attr)
@@ -748,6 +829,7 @@ void disp_write(dispc_t *disp,
   int range_num_chars;
 
   ASSERT(VALID_DISP(disp));
+  ASSERT(s_disp_palette_id_is_valid(disp, attr));
 
   len = strlen(s);
   if (len == 0)
@@ -779,7 +861,7 @@ void disp_write(dispc_t *disp,
     }
 
     char_ln[i].c = s[i];
-    char_ln[i].a = DISP_LO_BYTE(attr);
+    char_ln[i].a = attr;
   }
 
   range_num_chars = 0;
@@ -805,8 +887,8 @@ refresh call to the OS if nothing changed.
 @param s     string to display
 @param x     coordinates
 @param y     coordinates
-@param attr1 attributes
-@param attr2 attributes
+@param attr1 palette ID of display attributes 1
+@param attr2 palette ID of display attributes 2
 */
 void disp_flex_write(dispc_t *disp,
                      const char *s, int x, int y, int attr1, int attr2)
@@ -823,6 +905,8 @@ void disp_flex_write(dispc_t *disp,
   int range_num_chars;
 
   ASSERT(VALID_DISP(disp));
+  ASSERT(s_disp_palette_id_is_valid(disp, attr1));
+  ASSERT(s_disp_palette_id_is_valid(disp, attr2));
 
   len = strlen(s);
   if (len == 0)
@@ -849,7 +933,7 @@ void disp_flex_write(dispc_t *disp,
     else
     {
       a.c = s[i];
-      a.a = DISP_LO_BYTE(attr);
+      a.a = attr;
 
       d = char_ln + display_len;
       if (!disp_char_equal(a, *d))
@@ -860,7 +944,7 @@ void disp_flex_write(dispc_t *disp,
       }
 
       char_ln[display_len].c = s[i];
-      char_ln[display_len].a = DISP_LO_BYTE(attr);
+      char_ln[display_len].a = attr;
       ++display_len;
     }
   }
@@ -884,7 +968,7 @@ refresh call to the OS if nothing changed.
 
 @param disp  a display object
 @param c     character with whcih to fill
-@param attr  attribute of the character
+@param attr  palette ID of display attribute of the character
 @param x     coordinates
 @param y     coordinates
 @param count how much to fill
@@ -901,6 +985,7 @@ void disp_fill(dispc_t *disp, char c, int attr, int x, int y, int count)
 
   ASSERT(VALID_DISP(disp));
   ASSERT(count >= 0);
+  ASSERT(s_disp_palette_id_is_valid(disp, attr));
 
   if (count == 0)
     return;
@@ -929,7 +1014,7 @@ void disp_fill(dispc_t *disp, char c, int attr, int x, int y, int count)
     }
 
     char_ln[i].c = c;
-    char_ln[i].a = DISP_LO_BYTE(attr);
+    char_ln[i].a = attr;
   }
 
   range_num_chars = 0;

@@ -38,16 +38,37 @@ prototype of assert.
 /* C4200: nonstandard extension used : zero-sized array in struct/union */
 
 #define DISP_EVENT_QUEUE_SIZE 32
+#define DISP_MAX_FONTS 4
+#define DISP_MAX_PAL 128
 
 struct disp_char
 {
   char c;
-  unsigned char a;
+  int a;  /* palette ID of display attributes */
 };
 
 #define disp_char_equal(c1, c2) (((c1).c == (c2).c) && ((c1).a == (c2).a))
 
 typedef struct disp_char disp_char_t;
+
+struct disp_pal
+{
+  int in_use;
+  unsigned int color;
+  unsigned int background;
+  int font_id;
+};
+
+typedef struct disp_pal disp_pal_t;
+
+struct disp_font
+{
+  int ref_cnt;
+  unsigned style;
+  HFONT font;
+};
+
+typedef struct disp_font disp_font_t;
 
 struct dispc
 {
@@ -65,9 +86,11 @@ struct dispc
   screen output
   */
   HWND  wnd;
-  HFONT font;
+  int   default_attr;  /* palette entry */
   SIZE  char_size;
   TCHAR *window_class;
+  disp_pal_t palette[DISP_MAX_PAL];
+  disp_font_t fonts[DISP_MAX_FONTS];
 
   disp_char_t *char_buf;
   int buf_height;
