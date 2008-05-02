@@ -182,6 +182,7 @@ int disp_init(const disp_wnd_param_t *wnd_param, void *disp_obj)
   disp->string_id = disp_id;
   #endif
 
+  disp_error_clear(disp);
   s_disp_ev_q_init(disp);
 
   disp_wnd_set_param(disp, wnd_param);
@@ -225,7 +226,7 @@ void disp_error_clear(dispc_t *disp)
   ASSERT(VALID_DISP(disp));
   disp->code = DISP_NO_ERROR;
   disp->error_msg[0] = '\0';
-  disp->os_error_msg[0] = '\0';
+  strcpy(disp->os_error_msg, "ok");  /* assume there is no OS error */
 }
 
 /*!
@@ -492,10 +493,16 @@ unsigned long disp_pal_compose_rgb(const dispc_t *disp, int r, int g, int b)
 /*!
 @brief Adds an entry to the palette of the display
 
+The disp structure uses an array to store the palette description.
+By default there is room for 128 entries. To increase that
+add -D DISP_MAX_PAL 256 to increase to 256 for example.
+
 @param disp            a dispc object
 @param rgb_color       WIN32 rgb foreground color
-@param rgb_backgroung  WIN32 rgb background color
-@param font_style      bit mask for font style
+@param rgb_background  WIN32 rgb background color
+@param font_style      bit mask for font style. Bitwise OR
+of DISP_FONT_ITALIC, DISP_FONT_BOLD, DISP_FOND_REVERSE. Not all are valid
+on all platforms.
 @param *palette_id     returns here a handle to palette entry
 
 @return -1 error, disp->code & disp->error_msg are set

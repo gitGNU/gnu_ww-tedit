@@ -40,25 +40,31 @@ prototype of assert.
 /* The top level API, platform independent part */
 #include "disp_common.c"
 
+#define DISP_FONT_STYLE_BITS (DISP_FONT_ITALIC | DISP_FONT_BOLD | DISP_FONT_UNDERLINE | DISP_FONT_REVERSE)
+
 /*!
-@brief Maps DOS palette to ncurses color pairs (ncurses)
+@brief Creates new color pair combination
 
-Use a byte as color/background combination from a PC palette to get the
-CURSES color/backgraound color pair index. Not all the entries in the
-array will have their CURSES pair counterpart. As CURSES can have up to
-64 color pair definitions at one and the same time.
+NCURSES operates on the principal of color pairs. Before
+doing output of any color & background the two must be matched into a pair
+and registered with the ncurses library.
 
-@param disp        a dispc object
-@param pal         DOS palette
-@param num_entries size of palette
+If the pair has been already created its returns its ID, otherwise it
+creates a new one
 
-@return 0 failure in allocating ncurses color pairs
-@return 1 no error
-
-TODO: remove this function
+@param disp                disp object
+@param ncurses_color       color, range 0..16, like DOS colors
+@param ncurses_background  background, range 0..16, like DOS colors
+@return font id
+@return -1 error, disp->code & disp->error_msg are set
 */
-int disp_map_palette(dispc_t *disp, unsigned char *pal, int num_entries)
+static int s_disp_add_color_pair(dispc_t *disp,
+                                 unsigned int ncurses_color,
+                                 unsigned int ncurses_background)
 {
+  int i;
+  int r;
+
   /* Use PC color as index to get CURSES color constant */
   static unsigned char PC_TO_CURSES[8] =
   {
@@ -71,57 +77,211 @@ int disp_map_palette(dispc_t *disp, unsigned char *pal, int num_entries)
     COLOR_YELLOW,
     COLOR_WHITE
   };
-  int r;
-  int i;
-  int c;
-  int b;
-  int should_set_to_bold;
-  int pair_index;
 
-  ASSERT(pal != NULL);
-  ASSERT(num_entries > 0);
-
-  memset(disp->palette_flags, 0, sizeof(disp->palette_flags));
-  memset(disp->palette_to_color_pairs, 0, sizeof(disp->palette_to_color_pairs));
-
-  /*
-  Enumerate all user palette entries and generate
-  a new color pair for the ncurses library
-  */
-  pair_index = 1;  /* pair color ID for ncurses allocation */
-  for (i = 0; i < num_entries; ++i)
+  /* 1. Find if the pair is not already created */
+  for (i = 1; i < DISP_COUNTOF(disp->color_pairs); ++i)
   {
-    /* define specific color+background combination only once           */
-    /* tip: col+background is a byte and palette_flags[] is of size 256 */
-    if (disp->palette_flags[pal[i]].defined)
-      continue;
-
-    /* new color+background combination */
-    c = pal[i] & 0x0f;
-    b = pal[i] >> 4;
-    should_set_to_bold = 0;
-    if (c >= 8)
+    if (   disp->color_pairs[i].in_use
+        && disp->color_pairs[i].store_color == ncurses_color
+        && disp->color_pairs[i].store_background == ncurses_background)
     {
-      c -= 8;
-      should_set_to_bold = 1;
+      ++disp->color_pairs[i].ref_cnt;
+      return i;
     }
-    r = init_pair(pair_index, PC_TO_CURSES[c], PC_TO_CURSES[b]);
-    if (r == ERR)
-    {
-      disp->code = DISP_NCURSES_COLOR_ALLOC_FAIL;
-      snprintf(disp->error_msg, sizeof(disp->error_msg),
-               "failed to allocate ncurses color pairs");
-      return 0;
-    }
-
-    disp->palette_to_color_pairs[pal[i]] = pair_index;
-    disp->palette_flags[pal[i]].set_bold = should_set_to_bold;
-    disp->palette_flags[pal[i]].defined = 1;
-
-    ++pair_index;
   }
 
-  return 1;
+  /* 2. Find unused entry (notice that 0 is not usable) */
+  for (i = 1; i < DISP_COUNTOF(disp->color_pairs); ++i)
+  {
+    if (disp->color_pairs[i].in_use == 0)  /* we reached unused one */
+      break;
+  }
+
+  if (i == DISP_COUNTOF(disp->color_pairs))
+  {
+    disp->code = DISP_NCURSES_COLOR_ALLOC_FAIL;
+    snprintf(disp->error_msg, sizeof(disp->error_msg),
+              "no room for additional ncurses color pairs");
+    return -1;
+  }
+
+  ASSERT(ncurses_color < DISP_COUNTOF(PC_TO_CURSES));
+  ASSERT(ncurses_background < DISP_COUNTOF(PC_TO_CURSES));
+
+  /* Index of color_pairs is also index used by ncurses */
+  r = init_pair(i, PC_TO_CURSES[ncurses_color], PC_TO_CURSES[ncurses_background]);
+  if (r == ERR)
+  {
+    disp->code = DISP_NCURSES_COLOR_ALLOC_FAIL;
+    snprintf(disp->error_msg, sizeof(disp->error_msg),
+             "init_pair() failed to allocate ncurses color pair");
+    return -1;
+  }
+
+  disp->color_pairs[i].in_use = 1;
+  disp->color_pairs[i].store_color = ncurses_color;
+  disp->color_pairs[i].store_background = ncurses_background;
+  return i;  /* i is the new colorID */
+}
+
+/*!
+@brief Adds new entry to the palette
+
+@param disp a dispc object
+@param ncurses_color       foreground color
+@param ncurses_background  background color
+@param font_style      bit mask for font style
+@param *palette_id     returns here a handle to palette entry
+@return 0 error, disp->code & disp->error_msg are set
+*/
+static int s_disp_pal_add(dispc_t *disp,
+                 unsigned int ncurses_color, unsigned int ncurses_background,
+                 unsigned font_style, int *palette_id)
+{
+  int i;
+  int color_pair_id;
+
+  /* check: only valid bits are set */
+  ASSERT((font_style & DISP_FONT_STYLE_BITS) == font_style);
+  ASSERT(palette_id != NULL);
+
+  if (ncurses_color >= 8)
+  {
+    ncurses_color -= 8;
+    font_style |= DISP_FONT_BOLD;  /* emulate highlight for ncurses */
+  }
+
+  color_pair_id =
+    s_disp_add_color_pair(disp, ncurses_color, ncurses_background);
+  if (color_pair_id == -1)
+    return 0;
+
+  for (i = 0; i < DISP_COUNTOF(disp->palette); ++i)
+  {
+    if (disp->palette[i].in_use)
+      continue;
+    disp->palette[i].in_use = 1;
+    disp->palette[i].color_pair_id = color_pair_id;
+    disp->palette[i].attr_mask = 0;
+    if (font_style & DISP_FONT_ITALIC)
+      disp->palette[i].attr_mask |= A_NORMAL;
+    if (font_style & DISP_FONT_BOLD)
+      disp->palette[i].attr_mask |= A_BOLD;
+    if (font_style & DISP_FONT_UNDERLINE)
+      disp->palette[i].attr_mask |= A_UNDERLINE;
+    if (font_style & DISP_FONT_REVERSE)
+      disp->palette[i].attr_mask |= A_REVERSE;
+    *palette_id = i;
+    return 1;
+  }
+
+  /* no space in the palette table */
+  disp->code = DISP_PALETTE_FULL;
+  snprintf(disp->error_msg, sizeof(disp->error_msg),
+           "no more entries available in the palette table");
+  return 0;
+}
+
+/*!
+@brief Disposes of one palette entry.
+
+Fonts are freed if no palette entry uses them.
+
+@param disp        a dispc object
+@param palette_id  id of palette entry from disp_pal_add()
+*/
+static void s_disp_pal_free(dispc_t *disp, int palette_id)
+{
+  /* TODO: implement if needed */
+  DISP_REFERENCE(disp);
+  DISP_REFERENCE(palette_id);
+}
+
+/*!
+@brief Finds if specific palette entry is within range
+
+@param disp        a dispc object
+@param palette_id  palette ID of display attribute
+*/
+static int s_disp_palette_id_is_valid(const dispc_t *disp, int palette_id)
+{
+  DISP_REFERENCE(disp);
+  return (palette_id < DISP_COUNTOF(disp->palette) && palette_id >= 0);
+}
+
+/*!
+@brief Platform dependent color
+
+This function works on WIN32 gui platform.
+
+@param disp   a dispc object
+@param color  one of the original 16 DOS colors
+
+@returns platrorm dependent color value
+*/
+static unsigned long s_disp_pal_get_standard(const dispc_t *disp, int color)
+{
+  DISP_REFERENCE(disp);
+  ASSERT(color >= 0);
+  ASSERT(color <= 0x0f);
+
+  return color;  /* standard colors don't need mapping for ncurses */
+}
+
+/*!
+@brief  Platform dependent color
+
+For RGB of standard 16 DOS colors use disp_pal_standard().
+This function only works on WIN32.
+
+@param disp   a dispc object
+@param r      red component
+@param g      green component
+@param b      blue component
+
+@returns platrorm dependent color value
+*/
+static unsigned long s_disp_pal_compose_rgb(const dispc_t *disp,
+                                            int r, int g, int b)
+{
+  DISP_REFERENCE(disp);
+  DISP_REFERENCE(r);
+  DISP_REFERENCE(g);
+  DISP_REFERENCE(b);
+
+  return 0;
+}
+
+/*!
+@brief Extracts ncurses color pair id for a palette entry
+
+@param disp  a dispc object
+@param palette_id  palette id produced by s_disp_pal_add
+@returns the color pair id that can be use by ncurses
+*/
+static int s_disp_pal_get_color_pair_id(dispc_t *disp, int palette_id)
+{
+  ASSERT(VALID_DISP(disp));
+  ASSERT(palette_id < DISP_COUNTOF(disp->palette));
+  ASSERT(disp->palette[palette_id].in_use);
+
+  return disp->palette[palette_id].color_pair_id;
+}
+
+/*!
+@brief Extracts ncurses character style mask for a palette entry
+
+@param disp        a dispc object
+@param palette_id  palette id produced by s_disp_pal_add
+@returns the character style that can be use by ncurses
+*/
+static int s_disp_pal_get_char_style(dispc_t *disp, int palette_id)
+{
+  ASSERT(VALID_DISP(disp));
+  ASSERT(palette_id < DISP_COUNTOF(disp->palette));
+  ASSERT(disp->palette[palette_id].in_use);
+
+  return disp->palette[palette_id].attr_mask;
 }
 
 /*!
@@ -174,14 +334,11 @@ static void s_disp_validate_rect(dispc_t *disp,
       p = ncurs_buf + j;
 
       /* put char */
-      *p &= 0xffffff00;
-      *p |= c;
+      *p = c;
       /* put attr */
       *p &= 0xff;
-      ASSERT(disp->palette_flags[a].defined);
-      *p |= COLOR_PAIR(disp->palette_to_color_pairs[a]);
-      if (disp->palette_flags[a].set_bold)
-        *p |= A_BOLD;
+      *p |= COLOR_PAIR(s_disp_pal_get_color_pair_id(disp, a));
+      *p |= s_disp_pal_get_char_style(disp, a);
     }
 
     r = mvaddchnstr(y + i, x, ncurs_buf, w);

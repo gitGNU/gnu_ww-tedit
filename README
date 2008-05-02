@@ -187,6 +187,9 @@ After a rebuild these `home' and `end' will work on putty.
 TODO
 ----
 SHORT-TERM:
+* rename disp files: disp_common.c; disp_ncurs.c; disp_win_g.c;
+  disp_ncurs_p.h; disp_win_g_p.h;
+* Use frame characters for unix terminals: ACS_ULCORNER, ACS_LLCORNER, etc.
 * handle resize signal for ncurses
 * remove most of VALIDATE_HEAP_PTR and VALIDATE_HEAP, which were put temporarely
 * highlight pairs of () and []

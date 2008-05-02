@@ -29,12 +29,20 @@ D_ASSERT -- External assert() replacement function can be supplied in the form
 of a define -- D_ASSERT. It must conform to the standard C library
 prototype of assert.
 
+DISP_MAX_NCURS_ATTR -- default is 64, define externally to increase buffer
+
+DISP_MAX_PAL -- default is 128, increase for more palette entries
+
 */
 
 #ifndef P_NCURS_H
 #define P_NCURS_H
 
 #define DISP_EVENT_QUEUE_SIZE 32
+
+#ifndef DISP_MAX_NCURS_ATTR
+#define DISP_MAX_NCURS_ATTR 64
+#endif
 
 struct disp_char
 {
@@ -45,6 +53,27 @@ struct disp_char
 #define disp_char_equal(c1, c2) (((c1).c == (c2).c) && ((c1).a == (c2).a))
 
 typedef struct disp_char disp_char_t;
+
+struct disp_pal
+{
+  int in_use;
+  int color_pair_id;
+  /* ncurs_attr_mask: A_BOLD | A_REVERSE | A_UNDERLINE */
+  unsigned char attr_mask;
+};
+
+typedef struct disp_pal disp_pal_t;
+
+/* the index of this structre in the array is the ID of the color pair */
+struct disp_attr
+{
+  int in_use;
+  int ref_cnt;
+  unsigned int store_color;
+  unsigned int store_background;
+};
+
+typedef struct disp_attr disp_attr_t;
 
 struct dispc
 {
@@ -79,12 +108,8 @@ struct dispc
   int last_x;
   int last_y;
 
-  unsigned char palette_to_color_pairs[256];
-  struct
-  {
-    unsigned char set_bold:1;
-    unsigned char defined:1;
-  } palette_flags[256];
+  disp_pal_t palette[DISP_MAX_PAL];
+  disp_attr_t color_pairs[DISP_MAX_NCURS_ATTR];
 
   unsigned int ev_c;
   unsigned int ev_h;

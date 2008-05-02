@@ -921,8 +921,20 @@ void main2(int argc, char **argv)
   disp_set_safemem_proc(disp, disp_safe_malloc, disp_safe_free);
   if (!pal_init(disp))
   {
+    enum disp_error error_code;
+    char *error_msg;
+    char *os_error_msg;
+    char error_msg_buf[1024];
+
+    disp_error_get(disp, &error_code, &error_msg, &os_error_msg);
+    snprintf(error_msg_buf, sizeof(error_msg_buf) - 1,
+             "ww: disp: %d, %s, os: %s\n",
+             error_code, error_msg, os_error_msg);
+    disp_done(disp);  /* restore normal display */
+    fprintf(stderr, error_msg_buf);
+    /* TODO: also trace message in a log file */
     ASSERT(0);
-    return;  /* fatal, palette init, TODO: put a log message */
+    return 1;  /* fatal, palette init, TODO: put a log message */
   }
   wrkspace_set_disp(wrkspace, disp);
   InstallClipboardMonitor(disp);

@@ -66,10 +66,11 @@ static void s_disp_translate_os_error(dispc_t *disp)
 /*!
 @brief Instantiates a font with specific style
 
-If the font has been already created it returns it ID, otherwise it
+If the font has been already created it returns its ID, otherwise it
 creates a new one
 
 @param disp a dispc object
+@param font_style
 @return font id
 @return -1 error, disp->code & disp->error_msg are set
 */
@@ -80,15 +81,21 @@ static int s_disp_add_font(dispc_t *disp, unsigned int font_style)
   /* only valid bits are set */
   ASSERT((font_style & DISP_FONT_STYLE_BITS) == font_style);
 
+  /* 1. Find if the font is not already created */
   for (i = 0; i < DISP_COUNTOF(disp->fonts); ++i)
   {
-    if (disp->fonts[i].font == 0)
-      break;
     if (disp->fonts[i].style == font_style)
     {
       ++disp->fonts[i].ref_cnt;
       return i;
     }
+  }
+
+  /* 2. Find unused entry and create the new font */
+  for (i = 0; i < DISP_COUNTOF(disp->fonts); ++i)
+  {
+    if (disp->fonts[i].font == 0)  /* empty entry? */
+      break;
   }
 
   if (i == DISP_COUNTOF(disp->fonts))
@@ -132,8 +139,9 @@ static int s_disp_add_font(dispc_t *disp, unsigned int font_style)
 
 @param disp a dispc object
 @param rgb_color       WIN32 rgb foreground color
-@param rgb_backgroung  WIN32 rgb background color
-@param font_style      bit mask for font style
+@param rgb_background  WIN32 rgb background color
+@param font_style      bit mask for font style. Bitwise OR
+of DISP_FONT_ITALIC, DISP_FONT_BOLD.
 @param *palette_id     returns here a handle to palette entry
 @return 0 error, disp->code & disp->error_msg are set
 */
@@ -237,7 +245,7 @@ static unsigned long s_disp_pal_get_standard(const dispc_t *disp, int color)
 static int s_disp_palette_id_is_valid(const dispc_t *disp, int palette_id)
 {
   DISP_REFERENCE(disp);
-  return (palette_id < DISP_COUNTOF(disp->palette));
+  return (palette_id < DISP_COUNTOF(disp->palette) && palette_id >= 0);
 }
 
 /*!
@@ -303,7 +311,6 @@ static unsigned long s_disp_pal_compose_rgb(const dispc_t *disp,
 
   return RGB(r, g, b);
 }
-
 
 /*!
 @brief Marks area of the screen as invalid. (win32 GUI)

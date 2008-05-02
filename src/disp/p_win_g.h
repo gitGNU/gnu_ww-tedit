@@ -39,7 +39,6 @@ prototype of assert.
 
 #define DISP_EVENT_QUEUE_SIZE 32
 #define DISP_MAX_FONTS 4
-#define DISP_MAX_PAL 128
 
 struct disp_char
 {

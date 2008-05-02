@@ -17,6 +17,14 @@ Refactored: 19th Feb, 2006 from scr.h and kbd.h\n
 Module disp is a standalone library that abstracts the access to
 console output for WIN32 console, WIN32 GUI, ncurses and X11.
 
+@section c Compile time definitions
+
+D_ASSERT -- External assert() replacement function can be supplied in the form
+of a define -- D_ASSERT. It must conform to the standard C library
+prototype of assert.
+
+DISP_MAX_PAL -- default is 128, define externally to increase palette size
+
 */
 
 /*!
@@ -26,6 +34,10 @@ console output for WIN32 console, WIN32 GUI, ncurses and X11.
 
 #ifndef DISP_H
 #define DISP_H
+
+#ifndef DISP_MAX_PAL
+#define DISP_MAX_PAL 128
+#endif
 
 #define MAX_FONT_NAME_LEN 256
 #define MAX_DISP_ERROR_MSG_LEN  256
@@ -125,6 +137,7 @@ void disp_set_resize_handler(dispc_t *disp,
 #define DISP_FONT_ITALIC 1
 #define DISP_FONT_BOLD  2
 #define DISP_FONT_UNDERLINE 4
+#define DISP_FONT_REVERSE 8
 
 unsigned long disp_pal_get_standard(const dispc_t *disp, int color);
 unsigned long disp_pal_compose_rgb(const dispc_t *disp, int r, int g, int b);
