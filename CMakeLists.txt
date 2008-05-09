@@ -45,11 +45,11 @@ ENDIF (MY_WIN32 AND EXISTS src/dbghelp/dbghelp.h)
 
 IF (UNIX)
 SET(disp_platform_def "-D DISP_NCURSES")
-SET(disp_lib_src src/disp/ncurs_disp.c)
+SET(disp_lib_src src/disp/disp_ncurs.c)
 SET(dirent_src)
 ELSE (UNIX)
 SET(disp_platform_def "-D DISP_WIN32_GUIEMU")
-SET(disp_lib_src src/disp/win_g_disp.c)
+SET(disp_lib_src src/disp/disp_win_g.c)
 SET(dirent_src src/dirent.c)
 ENDIF (UNIX)
 

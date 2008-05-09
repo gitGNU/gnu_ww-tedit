@@ -59,7 +59,7 @@ struct disp_pal
   int in_use;
   int color_pair_id;
   /* ncurs_attr_mask: A_BOLD | A_REVERSE | A_UNDERLINE */
-  unsigned char attr_mask;
+  unsigned int attr_mask;
 };
 
 typedef struct disp_pal disp_pal_t;

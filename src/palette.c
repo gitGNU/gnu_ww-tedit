@@ -152,6 +152,8 @@ BYTE *CPalette = BorlandPalette;        /* Current palette */
 
 unsigned int ww_pal[MAX_PALETTE];
 
+#define PAL_BW
+
 int pal_init(dispc_t *disp)
 {
 #define PAL_ADD(idx, b, c, style) \
@@ -161,6 +163,15 @@ int pal_init(dispc_t *disp)
                    style, &ww_pal[idx])) \
     return 0;
 
+  #ifdef PAL_BW
+  PAL_ADD(coStatus, 0x0, 0x7, 0);
+  PAL_ADD(coError, 0x0, 0x7, 0);
+  PAL_ADD(coTabs, 0x0, 0x7, DISP_FONT_REVERSE);
+  PAL_ADD(coReadOnly, 0x0, 0x7, DISP_FONT_REVERSE);
+  PAL_ADD(coRecStored, 0x0, 0x7, DISP_FONT_REVERSE);
+  PAL_ADD(coStatusTxt, 0x0, 0x7, 0);
+  PAL_ADD(coStatusShortCut, 0x0, 0x7, DISP_FONT_REVERSE);
+  #else
   PAL_ADD(coStatus, 0x7, 0x0, 0);
   PAL_ADD(coError, 0x4, 0xf, 0);
   PAL_ADD(coTabs, 0x4, 0xf, 0);
@@ -168,7 +179,23 @@ int pal_init(dispc_t *disp)
   PAL_ADD(coRecStored, 0x7, 0x1, 0);
   PAL_ADD(coStatusTxt, 0x7, 0x0, 0);
   PAL_ADD(coStatusShortCut, 0x7, 0x4, 0);
+  #endif
 
+  #ifdef PAL_BW
+  PAL_ADD(coEOF, 0x0, 0x7, 0);
+  PAL_ADD(coEdText, 0x0, 0x7, 0);
+  PAL_ADD(coEdBlock, 0x0, 0x7, DISP_FONT_REVERSE);
+  PAL_ADD(coEdNumber, 0x0, 0x7, 0);
+  PAL_ADD(coEdComment, 0x0, 0x7, 0);
+  PAL_ADD(coEdReserved, 0x0, 0x7, DISP_FONT_BOLD);
+  PAL_ADD(coEdRegister, 0x0, 0x7, 0);
+  PAL_ADD(coEdInstruction, 0x0, 0x7, 0);
+  PAL_ADD(coEdString, 0x0, 0x7, 0);
+  PAL_ADD(coEdPreproc, 0x0, 0x7, DISP_FONT_BOLD);
+  PAL_ADD(coEdOper, 0x0, 0x7, DISP_FONT_BOLD);
+  PAL_ADD(coEdSFR, 0x0, 0x7, 0);
+  PAL_ADD(coEdPair, 0x0, 0x7, DISP_FONT_REVERSE);
+  #else
   #ifdef DARK_BPAL
   PAL_ADD(coEOF, 0x0, 0xf, 0);
   PAL_ADD(coEdText, 0x0, 0xe, 0);
@@ -197,6 +224,7 @@ int pal_init(dispc_t *disp)
   PAL_ADD(coEdOper, 0x1, 0xf, 0);
   PAL_ADD(coEdSFR, 0x1, 0xb, 0);
   PAL_ADD(coEdPair, 0x1, 0xa, 0);
+  #endif
   #endif
 
   PAL_ADD(coEdTooltip, 0x3, 0x0, 0);

@@ -1,10 +1,10 @@
 /*!
-@file ncurs_disp.c
+@file disp_ncurs.c
 @brief [disp] ncurses platform specific implementation of the console API
 
 @section a Header
 
-File: ncurs_disp.c\n
+File: disp_ncurs.c\n
 COPYING: Full text of the copyrights statement at the bottom of the file\n
 Project: WW text editor\n
 Started: 27th October, 1998\n
@@ -35,7 +35,7 @@ prototype of assert.
 #include <sys/time.h>
 
 #include "disp.h"
-#include "p_ncurs.h"
+#include "disp_ncurs_p.h"
 
 /* The top level API, platform independent part */
 #include "disp_common.c"

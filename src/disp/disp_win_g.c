@@ -1,10 +1,10 @@
 /*!
-@file win_g_disp.c
+@file disp_win_g.c
 @brief [disp] WIN32 GUI platform specific implementation of the console API
 
 @section a Header
 
-File: win_g_disp.c\n
+File: disp_win_g.c\n
 COPYING: Full text of the copyrights statement at the bottom of the file\n
 Project: WW text editor\n
 Started: 27th October, 1998\n
@@ -35,7 +35,7 @@ prototype of assert.
 #include <stdio.h>
 #include <malloc.h>
 #include "disp.h"
-#include "p_win_g.h"
+#include "disp_win_g_p.h"
 
 #include "disp_common.c"
 
