@@ -194,7 +194,7 @@ int pal_init(dispc_t *disp)
   PAL_ADD(coEdPreproc, 0x0, 0x7, DISP_FONT_BOLD);
   PAL_ADD(coEdOper, 0x0, 0x7, DISP_FONT_BOLD);
   PAL_ADD(coEdSFR, 0x0, 0x7, 0);
-  PAL_ADD(coEdPair, 0x0, 0x7, DISP_FONT_REVERSE);
+  PAL_ADD(coEdPair, 0x0, 0x7, DISP_FONT_UNDERLINE);
   #else
   #ifdef DARK_BPAL
   PAL_ADD(coEOF, 0x0, 0xf, 0);
@@ -259,6 +259,24 @@ int pal_init(dispc_t *disp)
   PAL_ADD(coHelpSelected, 0x3, 0xe, 0);
   PAL_ADD(coHelpTitle, 0x3, 0x0, 0);
 
+  #ifdef PAL_BW
+  PAL_ADD(coMenu, 0, 0x7, 0);
+  PAL_ADD(coMenuShortCut, 0, 0x7, DISP_FONT_BOLD | DISP_FONT_UNDERLINE);
+  PAL_ADD(coMenuSelected, 0, 0x7, DISP_FONT_REVERSE);
+  PAL_ADD(coMenuSeShortCt, 0, 0x7, DISP_FONT_REVERSE | DISP_FONT_BOLD | DISP_FONT_UNDERLINE);
+  PAL_ADD(coMenuDisabled, 0, 0x7, 0);
+  PAL_ADD(coMenuFrame, 0, 0x7, 0);
+  PAL_ADD(coMenuSeDisabl, 0, 0x7, 0);
+  PAL_ADD(coCtxHlpMenu, 0, 0x7, 0);
+  PAL_ADD(coCtxHlpMenuShortCut, 0, 0x7, DISP_FONT_BOLD | DISP_FONT_UNDERLINE);
+  PAL_ADD(coCtxHlpMenuSelected, 0, 0x7, DISP_FONT_REVERSE);
+  PAL_ADD(coCtxHlpMenuSeShortCt, 0, 0x7, DISP_FONT_REVERSE | DISP_FONT_BOLD | DISP_FONT_UNDERLINE);
+  PAL_ADD(coCtxHlpMenuDisabled, 0, 0x7, 0);
+  PAL_ADD(coCtxHlpMenuFrame, 0, 0x7, 0);
+  PAL_ADD(coCtxHlpMenuSeDisabl, 0, 0x7, 0);
+  PAL_ADD(coTerm1, 0x0, 0x7, 0);
+  PAL_ADD(coTerm2, 0x0, 0x7, DISP_FONT_BOLD);
+  #else
   PAL_ADD(coMenu, 0x7, 0x0, 0);
   PAL_ADD(coMenuShortCut, 0x7, 0x4, 0);
   PAL_ADD(coMenuSelected, 0x2, 0x0, 0);
@@ -275,6 +293,7 @@ int pal_init(dispc_t *disp)
   PAL_ADD(coCtxHlpMenuSeDisabl, 0x3, 0xe, 0);
   PAL_ADD(coTerm1, 0x0, 0x2, 0);
   PAL_ADD(coTerm2, 0x0, 0xa, 0);
+  #endif
 
   return 1;
 }
