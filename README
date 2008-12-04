@@ -18,7 +18,7 @@ NEWS for last 3 builds
 --- version 0.2.3 build TO BE 51 ---
 + using git for version control
 + new disp module, new API, completely reimplemented
-+ se doxygen for code documentation
++ use doxygen for code documentation
 + new keybindings for text terminals, improved ergonomics
 . [bug #11532] bad autoindent
 . [bug #17564] Typo in Edit -> Block menu (Lowecase)

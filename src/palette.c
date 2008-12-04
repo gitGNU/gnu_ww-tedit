@@ -152,7 +152,8 @@ BYTE *CPalette = BorlandPalette;        /* Current palette */
 
 unsigned int ww_pal[MAX_PALETTE];
 
-#define PAL_BW
+/* PAL_BW is an experimental austere BW palette */
+//#define PAL_BW
 
 int pal_init(dispc_t *disp)
 {

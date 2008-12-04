@@ -335,7 +335,10 @@ static void s_disp_validate_rect(dispc_t *disp,
 
       /* put char */
       *p = c;
+
       /* put attr */
+      /* TODO: optional support for BW terminals color comes here.
+      Depending on terminal don't add color & style to the character */
       *p &= 0xff;
       *p |= COLOR_PAIR(s_disp_pal_get_color_pair_id(disp, a));
       *p |= s_disp_pal_get_char_style(disp, a);
@@ -1101,6 +1104,8 @@ static int s_disp_init(dispc_t *disp)
     return 0;
   }
 
+  /* TODO: activate no color mode (not attributes and styles) here */
+  /* Actual implementation will be in s_disp_validate_rect()       */
   if (start_color() == ERR)
   {
     disp->code = DISP_TERMINAL_NO_COLOR;
@@ -1175,7 +1180,7 @@ static void s_disp_wnd_set_title(dispc_t *disp, const char *title)
 This software is distributed under the conditions of the BSD style license.
 
 Copyright (c)
-1995-2007
+1995-2008
 Petar Marinov
 
 All rights reserved.

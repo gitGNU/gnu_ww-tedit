@@ -355,9 +355,9 @@ Files:
 disp_common.c -- the top level API functions, it is included in the
 platform specific implementations.
 
-win_g_disp.c -- WIN32 GUI emulation functions. It includes disp_common.c
+disp_win_g.c -- WIN32 GUI emulation functions. It includes disp_common.c
 
-ncurs_disp.c -- ncurses functions. It includes disp_common.c
+disp_ncurs.c -- ncurses functions. It includes disp_common.c
 
 Depends:
 
@@ -371,7 +371,7 @@ disp depends only on standard libraries
 This software is distributed under the conditions of the BSD style license.
 
 Copyright (c)
-1995-2006
+1995-2008
 Petar Marinov
 
 All rights reserved.

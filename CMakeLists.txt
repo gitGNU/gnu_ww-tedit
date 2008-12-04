@@ -1,4 +1,7 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
 PROJECT(ww)
+
 
 # set to TRUE for debugging the compilation
 SET(CMAKE_VERBOSE_MAKEFILE FALSE)
